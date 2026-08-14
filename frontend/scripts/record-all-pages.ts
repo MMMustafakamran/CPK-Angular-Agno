@@ -437,6 +437,8 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
       if (t4Box) {
         await humanGlide(page, t4Box.x + t4Box.width / 2, t4Box.y + t4Box.height / 2, 20);
         await humanClick(page);
+        await sleep(300);
+        await humanClick(page);
       }
       await sleep(1500);
       // Glide mouse to center of the opened docked sidebar
