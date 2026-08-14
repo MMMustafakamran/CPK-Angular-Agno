@@ -437,9 +437,58 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
       // --------------------------------------------------
       console.log(`   [Attachments] Uploading sample document and prompting...`);
       const sampleFilePath = join(ROOT, 'sample_report.pdf');
-      if (!existsSync(sampleFilePath)) {
-        writeFileSync(sampleFilePath, '%PDF-1.4 sample test document for copilotkit attachments');
-      }
+      const samplePdfContent = `%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 520 >>
+stream
+BT
+/F1 18 Tf
+50 720 Td
+(Top Secret Mission: AI Agent Space Odyssey) Tj
+/F1 11 Tf
+0 -30 Td
+(Mission Status: Fully Operational  |  Fuel Source: 100% Espresso) Tj
+0 -25 Td
+(Classified Agent Briefing & Fun Facts:) Tj
+0 -20 Td
+(1. Why do programmers love dark mode? Because light attracts bugs!) Tj
+0 -18 Td
+(2. Autonomous AI agents have officially achieved warp speed with Agno + CopilotKit.) Tj
+0 -18 Td
+(3. In case of space emergency: Don't panic, just run npm run record!) Tj
+0 -18 Td
+(4. Quantum computers calculate that 99.9% of code runs better with coffee.) Tj
+0 -25 Td
+(Final Verdict: Mission approved. Ready for deployment across all galaxies!) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000244 00000 n 
+0000000814 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+890
+%%EOF`;
+      writeFileSync(sampleFilePath, samplePdfContent);
 
       // Locate the (+) attachment trigger button
       const attachBtn = page.locator('button[aria-label="Add photos or files"], button[tooltipposition="below"].cdk-menu-trigger, .copilotKitInput button:first-of-type').first();
@@ -492,7 +541,7 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
       // VOICE DEMO: Click microphone icon and showcase voice activation / permission
       // --------------------------------------------------
       console.log(`   [Voice] Activating microphone control...`);
-      const micBtn = page.locator('button[aria-label*="mic"], button[aria-label*="voice"], button:has(svg path[d*="M12 2a3"]), button:has(svg)').last();
+      const micBtn = page.locator('button[aria-label="Transcribe"], button[aria-label*="Transcribe"], button[aria-label*="mic"], button[aria-label*="voice"]').first();
       await micBtn.waitFor({ timeout: 6000 });
       const micBox = await micBtn.boundingBox();
       if (micBox) {
