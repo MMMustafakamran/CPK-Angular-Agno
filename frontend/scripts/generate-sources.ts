@@ -18,9 +18,12 @@ const TARGETS = [
   'src/styles.css',
   'src/app/app.config.ts',
   'src/app/features',
+  '../backend/main.py',
+  '../backend/pyproject.toml',
+  '../.env.example',
 ];
 
-const EXTENSIONS = ['.ts', '.html', '.css'];
+const EXTENSIONS = ['.ts', '.html', '.css', '.py', '.toml', '.example'];
 
 function walk(absolute: string, out: string[]): void {
   if (!statSync(absolute).isDirectory()) {

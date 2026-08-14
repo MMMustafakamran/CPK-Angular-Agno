@@ -53,6 +53,11 @@ export const routes: Routes = [
     path: 'headless/demo',
     loadComponent: () => import('./pages/demos').then((m) => m.HeadlessDemo),
   },
+  {
+    path: 'ide',
+    loadComponent: () =>
+      import('./pages/ide-view.component').then((m) => m.IdeViewComponent),
+  },
 
   // Doc routes, inside the sidebar chrome.
   {
