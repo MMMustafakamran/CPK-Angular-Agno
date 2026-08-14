@@ -103,15 +103,6 @@ export const PAGES: PageRecordConfig[] = [
     prompt: 'Explain how the Agno agent communicates with Copilot Runtime in 2 sentences.',
   },
   {
-    id: 'a2ui',
-    name: 'A2UI Schemas & Styling',
-    docUrl: 'https://docs.copilotkit.ai/angular/agno/guides/a2ui',
-    ideFile: 'src/app/features/a2ui/a2ui-chat.component.ts',
-    ideLine: 15,
-    demoUrl: 'http://localhost:4200/a2ui/demo',
-    prompt: 'Show flight status for flight AA100',
-  },
-  {
     id: 'voice-multimodal',
     name: 'Voice & Multimodal',
     docUrl: 'https://docs.copilotkit.ai/angular/agno/guides/voice-multimodal',
@@ -119,24 +110,6 @@ export const PAGES: PageRecordConfig[] = [
     ideLine: 15,
     demoUrl: 'http://localhost:4200/voice-multimodal/demo',
     prompt: 'Hello from multimodal assistant!',
-  },
-  {
-    id: 'threads',
-    name: 'Threads & Conversations',
-    docUrl: 'https://docs.copilotkit.ai/angular/agno/guides/threads-memory-attachments-headless',
-    ideFile: 'src/app/features/threads/threads-demo.component.ts',
-    ideLine: 20,
-    demoUrl: 'http://localhost:4200/threads/demo',
-    prompt: 'Start a new conversation thread for support',
-  },
-  {
-    id: 'memory',
-    name: 'Agent Memory',
-    docUrl: 'https://docs.copilotkit.ai/angular/agno/guides/threads-memory-attachments-headless',
-    ideFile: 'src/app/features/memory/memory-demo.component.ts',
-    ideLine: 20,
-    demoUrl: 'http://localhost:4200/memory/demo',
-    prompt: 'Remember that I prefer TypeScript and Angular',
   },
 ];
 
@@ -364,7 +337,7 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
     // ----------------------------------------------------
     console.log(`\n💻 Step 2: Displaying Project Code in IDE (${config.ideFile}:${config.ideLine})...`);
     const ideUrl = `http://localhost:4200/ide?file=${encodeURIComponent(config.ideFile)}&line=${config.ideLine}`;
-    await page.goto(ideUrl, { waitUntil: 'networkidle', timeout: 10000 });
+    await page.goto(ideUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
     await ensureOverlays(page, 'vscode');
     await sleep(800);
 
@@ -401,7 +374,7 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
     // STEP 3: FRONTEND DEMO & ACTIVE PROMPT EXECUTION
     // ----------------------------------------------------
     console.log(`\n🚀 Step 3: Opening Demo and Sending Prompt (${config.prompt})...`);
-    await page.goto(config.demoUrl, { waitUntil: 'networkidle', timeout: 10000 });
+    await page.goto(config.demoUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
     await ensureOverlays(page, 'chrome');
     await sleep(1500);
 
@@ -460,7 +433,6 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
 
     if (video) {
       const finalWebm = join(RECORDINGS_DIR, `${config.id}.webm`);
-      const finalMp4 = join(RECORDINGS_DIR, `${config.id}.mp4`);
 
       try {
         const tempPath = await video.path();
@@ -468,15 +440,6 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
           if (existsSync(finalWebm)) unlinkSync(finalWebm);
           renameSync(tempPath, finalWebm);
           console.log(`🎥 WebM Video saved: ${finalWebm}`);
-
-          // Convert to MP4 via FFmpeg
-          try {
-            console.log(`🔄 Converting to MP4: ${finalMp4}...`);
-            execSync(`ffmpeg -y -i "${finalWebm}" -c:v libx264 -pix_fmt yuv420p "${finalMp4}"`, { stdio: 'ignore' });
-            console.log(`✨ Final MP4 ready: ${finalMp4}`);
-          } catch (err) {
-            console.warn(`FFmpeg conversion note: ${err}`);
-          }
         }
       } catch (err) {
         console.warn(`Video save note: ${err}`);
