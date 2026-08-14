@@ -258,20 +258,6 @@ async function humanScrollDown(page: Page, totalPixels: number = 550, speedMs: n
   }
 }
 
-/** Injects an animated spotlight highlight overlay onto a selector */
-async function spotlightElement(page: Page, selector: string): Promise<void> {
-  await page.evaluate(`
-    (function() {
-      var el = document.querySelector(${JSON.stringify(selector)});
-      if (el) {
-        el.style.outline = '4px solid #6366f1';
-        el.style.outlineOffset = '6px';
-        el.style.boxShadow = '0 0 35px rgba(99, 102, 241, 0.7)';
-        el.style.transition = 'all 0.6s ease-in-out';
-      }
-    })()
-  `);
-}
 
 async function recordPage(config: PageRecordConfig): Promise<void> {
   console.log(`\n======================================================`);
@@ -324,7 +310,6 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
         if (box) {
           await humanGlide(page, box.x + box.width / 2, box.y + 40, 25);
         }
-        await spotlightElement(page, 'pre, code, div[class*="code"]');
       }
       await sleep(3500);
     } catch (e) {
@@ -456,19 +441,37 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
         writeFileSync(sampleFilePath, '%PDF-1.4 sample test document for copilotkit attachments');
       }
 
-      // Locate attachment upload button and file input
-      const fileInput = page.locator('input[type="file"]').first();
-      const attachBtn = page.locator('button:has-text("+"), button[aria-label*="attach"], button[aria-label*="Upload"], .copilotKitAttachmentButton, button:has(svg path[d*="M12 4v16"])').first();
-      const attachBox = await attachBtn.boundingBox().catch(() => null);
+      // Locate the (+) attachment trigger button
+      const attachBtn = page.locator('button[aria-label="Add photos or files"], button[tooltipposition="below"].cdk-menu-trigger, .copilotKitInput button:first-of-type').first();
+      await attachBtn.waitFor({ timeout: 6000 });
+      const attachBox = await attachBtn.boundingBox();
       if (attachBox) {
+        // Glide smoothly to the (+) button and click
         await humanGlide(page, attachBox.x + attachBox.width / 2, attachBox.y + attachBox.height / 2, 20);
         await humanClick(page);
       }
+      await sleep(600);
 
-      if (await fileInput.count() > 0) {
-        await fileInput.setInputFiles(sampleFilePath);
-      }
-      await sleep(1500);
+      // Check if a CDK menu appeared (e.g. Upload file / Upload photo)
+      try {
+        const menuItem = page.locator('[role="menuitem"], .cdk-menu-item, button:has-text("Upload"), button:has-text("file"), button:has-text("Photo")').first();
+        if (await menuItem.isVisible({ timeout: 1000 }).catch(() => false)) {
+          const mBox = await menuItem.boundingBox();
+          if (mBox) {
+            await humanGlide(page, mBox.x + mBox.width / 2, mBox.y + mBox.height / 2, 15);
+            await humanClick(page);
+          }
+        }
+      } catch {}
+
+      // Set files on file input
+      try {
+        const fileInput = page.locator('input[type="file"]').first();
+        if (await fileInput.count() > 0) {
+          await fileInput.setInputFiles(sampleFilePath);
+        }
+      } catch {}
+      await sleep(2000);
 
       // Focus input, type prompt, and send
       const inputLocator = page.locator('textarea, input[type="text"], [contenteditable="true"]').first();
