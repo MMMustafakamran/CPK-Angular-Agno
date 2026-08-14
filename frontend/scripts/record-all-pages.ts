@@ -411,7 +411,7 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
         await humanGlide(page, inputBox2.x + 80, inputBox2.y + inputBox2.height / 2, 20);
         await humanClick(page);
       }
-      const prompt2 = 'Explain custom assistant message rendering.';
+      const prompt2 = 'Tell me a fun fact about programming in 1 sentence.';
       for (const c of prompt2) await page.keyboard.type(c, { delay: 45 });
       await sleep(400);
       await page.keyboard.press('Enter');

@@ -250,7 +250,51 @@ Verified 2026-08-12 against a live stack (real OpenAI key, no license key).
 
 ---
 
-## 9. Known issues / doc-vs-implementation discrepancies
+## 9. Automated Screen Recording Pipeline
+
+This project includes a fully automated 1080p video recording engine ([`frontend/scripts/record-all-pages.ts`](file:///c:/Users/dynamic%20computer/Desktop/work/FIQROS/optimized-malaika/agno-angular/frontend/scripts/record-all-pages.ts)) powered by Playwright. It automates end-to-end screen recordings for all verified error-free documentation routes.
+
+### Standard 3-Step Walkthrough per Page
+Each recording systematically captures:
+1. **Official Doc Walkthrough** (`https://docs.copilotkit.ai/...`): Smooth mouse-wheel scrolling down the documentation with an animated glowing spotlight highlighting the relevant code block.
+2. **Project Code in IDE** (`/ide?file=...&line=...`): Navigates to the full-screen VS Code IDE view, clicks the file in the explorer tree, smoothly scrolls the editor to center the target lines, and highlights the implementation.
+3. **Interactive Demo Execution** (`/<page>/demo`): Opens the clean, chrome-free demo surface and performs authentic human interactions:
+   - **Chat UI (`/chat-ui/demo`)**: Walks through all 4 surfaces in sequence — prompts & streams on `Inline chat` and `Custom assistant message`, and opens the `Popup` and `Sidebar` surfaces in single clicks.
+   - **Attachments (`/attachments/demo`)**: Clicks the attachment button, uploads a sample document (`sample_report.pdf`), displays the attachment chip, and submits a review prompt.
+   - **Voice & Multimodal (`/voice-multimodal/demo`)**: Glides to the microphone icon, clicks it, and demonstrates the active listening state.
+   - **Other Pages**: Types realistic prompts character-by-character (~45ms cadence) and captures the live streaming AI response.
+
+### Presentation Simulation Features
+- **Windows 11 Taskbar**: Pinned frosted-glass taskbar overlay with Start menu, search, active app indicators (switching between Chrome and VS Code), system tray, and a **live local ticking clock & date**.
+- **Visible OS Mouse Cursor (`🏹`)**: Curved mouse gliding (`humanGlide`) with realistic click-depression animations.
+- **Zero White Flash**: Pre-warmed dark theme canvas transitions between all pages.
+
+### How to Run
+
+Ensure the backend (`localhost:8000`) and frontend (`localhost:4200` & `:8200`) are running, then run from the `frontend/` directory:
+
+```bash
+# Record all verified error-free pages in sequence
+npm run record
+
+# Record any specific page individually
+npm run record -- --page=quickstart
+npm run record -- --page=chat-ui
+npm run record -- --page=frontend-tools-generative-ui
+npm run record -- --page=human-in-the-loop
+npm run record -- --page=shared-state
+npm run record -- --page=attachments
+npm run record -- --page=headless
+npm run record -- --page=voice-multimodal
+```
+
+### Video Output Location
+All recordings are saved directly as high-definition `.webm` video files in:
+👉 `frontend/recordings/<page_id>.webm`
+
+---
+
+## 10. Known issues / doc-vs-implementation discrepancies
 
 Found while building against `@copilotkit/angular` **0.3.1** and `@copilotkit/runtime` **1.67.1**.
 
@@ -328,7 +372,7 @@ The renderer name in `registerRenderToolCall({ name })` must equal the agent's t
 
 ---
 
-## 10. Troubleshooting
+## 11. Troubleshooting
 
 | Symptom | Cause | Fix |
 |---|---|---|
@@ -347,7 +391,7 @@ The renderer name in `registerRenderToolCall({ name })` must equal the agent's t
 
 ---
 
-## 11. Project structure
+## 12. Project structure
 
 ```
 agno/
@@ -359,7 +403,9 @@ agno/
 │   ├── AGENTS.md              # Angular style rules this repo's own code follows
 │   ├── server.ts              # ★ CopilotRuntime + AgnoAgent binding  → :8200
 │   ├── scripts/
-│   │   └── generate-sources.ts  # ★ reads real files → generated-sources.ts
+│   │   ├── generate-sources.ts  # ★ reads real files → generated-sources.ts
+│   │   └── record-all-pages.ts  # ★ Playwright automated video recording suite
+│   ├── recordings/            # ★ Output high-definition .webm recordings
 │   └── src/
 │       ├── styles.css         # CopilotKit stylesheet + the guides' CSS verbatim
 │       └── app/
@@ -386,7 +432,7 @@ The nav, every route header, the demo links, and the status table all derive fro
 
 ---
 
-## 12. References
+## 13. References
 
 **Getting Started** — [Angular + Agno quickstart](https://docs.copilotkit.ai/angular/agno/quickstart)
 

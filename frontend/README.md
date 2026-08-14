@@ -54,6 +54,27 @@ ng e2e
 
 Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
+## Automated Screen Recording
+
+To record the 3-step walkthroughs (Doc scroll $\rightarrow$ IDE highlight $\rightarrow$ Live demo) with the Windows 11 taskbar, live clock, and visible mouse cursor:
+
+```bash
+# Record all verified error-free pages
+npm run record
+
+# Record an individual page
+npm run record -- --page=quickstart
+npm run record -- --page=chat-ui
+npm run record -- --page=frontend-tools-generative-ui
+npm run record -- --page=human-in-the-loop
+npm run record -- --page=shared-state
+npm run record -- --page=attachments
+npm run record -- --page=headless
+npm run record -- --page=voice-multimodal
+```
+
+Outputs are saved as high-definition `.webm` video files in `frontend/recordings/`.
+
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
