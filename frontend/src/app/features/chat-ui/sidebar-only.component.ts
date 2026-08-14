@@ -24,5 +24,5 @@ import { CopilotSidebar } from '@copilotkit/angular';
   `,
 })
 export class SidebarOnlyComponent {
-  readonly sidebarOpen = signal(false);
+  readonly sidebarOpen = signal(true);
 }

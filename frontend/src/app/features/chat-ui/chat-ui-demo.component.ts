@@ -47,6 +47,7 @@ type Surface = 'inline' | 'custom-message' | 'popup' | 'sidebar';
                 ? 'border-[var(--accent)] bg-[var(--accent)] text-white'
                 : 'border-[var(--line-strong)] bg-[var(--surface)] text-[var(--ink-soft)] hover:border-[var(--accent)] hover:text-[var(--accent-ink)]'
             "
+            (pointerdown)="surface.set(tab.id)"
             (click)="surface.set(tab.id)"
           >
             {{ tab.label }}
@@ -68,39 +69,13 @@ type Surface = 'inline' | 'custom-message' | 'popup' | 'sidebar';
             </div>
           }
           @case ('popup') {
-            <div class="space-y-3">
-              <p class="text-sm text-[var(--ink-soft)]">
-                <code>copilot-popup</code> opens from a floating launcher and
-                exposes a two-way <code>open</code> model, so the harness can
-                open it from here. It manages focus, closes on Escape, and
-                restores focus to the launcher.
-              </p>
-              <button
-                type="button"
-                class="rounded-md border border-[var(--line-strong)] bg-[var(--surface)] px-3 py-1.5 text-sm font-medium text-[var(--ink-soft)] hover:border-[var(--accent)] hover:text-[var(--accent-ink)]"
-                (click)="popupHost.popupOpen.set(!popupHost.popupOpen())"
-              >
-                {{ popupHost.popupOpen() ? 'Close' : 'Open' }} popup
-              </button>
-              <app-popup-only #popupHost />
+            <div class="h-full">
+              <app-popup-only />
             </div>
           }
           @case ('sidebar') {
-            <div class="space-y-3">
-              <p class="text-sm text-[var(--ink-soft)]">
-                <code>copilot-sidebar</code> is docked to the right at 480px.
-                Compact viewports render it as a modal even when
-                <code>mode</code> is <code>"docked"</code>, and only one open
-                docked sidebar can own the page margin at a time.
-              </p>
-              <button
-                type="button"
-                class="rounded-md border border-[var(--line-strong)] bg-[var(--surface)] px-3 py-1.5 text-sm font-medium text-[var(--ink-soft)] hover:border-[var(--accent)] hover:text-[var(--accent-ink)]"
-                (click)="sidebarHost.sidebarOpen.set(!sidebarHost.sidebarOpen())"
-              >
-                {{ sidebarHost.sidebarOpen() ? 'Close' : 'Open' }} sidebar
-              </button>
-              <app-sidebar-only #sidebarHost />
+            <div class="h-full">
+              <app-sidebar-only />
             </div>
           }
         }

@@ -27,5 +27,5 @@ import { CopilotPopup } from '@copilotkit/angular';
   `,
 })
 export class PopupOnlyComponent {
-  readonly popupOpen = signal(false);
+  readonly popupOpen = signal(true);
 }

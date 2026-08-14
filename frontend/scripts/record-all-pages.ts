@@ -15,7 +15,7 @@
 
 import { chromium, type Page } from 'playwright';
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, renameSync, unlinkSync } from 'node:fs';
+import { existsSync, mkdirSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -371,57 +371,176 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
     await sleep(4500);
 
     // ----------------------------------------------------
-    // STEP 3: FRONTEND DEMO & ACTIVE PROMPT EXECUTION
+    // STEP 3: FRONTEND DEMO & TAILORED PROMPT EXECUTION
     // ----------------------------------------------------
-    console.log(`\n🚀 Step 3: Opening Demo and Sending Prompt (${config.prompt})...`);
+    console.log(`\n🚀 Step 3: Opening Demo (${config.demoUrl})...`);
     await page.goto(config.demoUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
     await ensureOverlays(page, 'chrome');
     await sleep(1500);
 
-    // Locate chat input in CopilotChat or headless textarea
-    const inputLocator = page.locator('textarea, input[type="text"], [contenteditable="true"]').first();
-    await inputLocator.waitFor({ timeout: 8000 });
+    if (config.id === 'chat-ui') {
+      // --------------------------------------------------
+      // CHAT UI DEMO: Show all 4 tabs, prompt tabs 1 & 2, open popup/sidebar on tabs 3 & 4
+      // --------------------------------------------------
+      console.log(`   [Chat UI] 1/4: Demonstrating Inline Chat tab...`);
+      const inputLocator1 = page.locator('textarea, input[type="text"], [contenteditable="true"]').first();
+      await inputLocator1.waitFor({ timeout: 8000 });
+      const inputBox1 = await inputLocator1.boundingBox();
+      if (inputBox1) {
+        await humanGlide(page, inputBox1.x + 80, inputBox1.y + inputBox1.height / 2, 20);
+        await humanClick(page);
+      }
+      const prompt1 = 'Hello! How can you help me today?';
+      for (const c of prompt1) await page.keyboard.type(c, { delay: 45 });
+      await sleep(400);
+      await page.keyboard.press('Enter');
+      console.log(`   Waiting for Inline Chat response...`);
+      await sleep(8000);
 
-    const inputBox = await inputLocator.boundingBox();
-    if (inputBox) {
-      // Glide mouse to the chat input box and click
-      await humanGlide(page, inputBox.x + 80, inputBox.y + inputBox.height / 2, 25);
-      await humanClick(page);
-    } else {
-      await inputLocator.click();
-    }
-    await sleep(400);
+      console.log(`   [Chat UI] 2/4: Demonstrating Custom Assistant Message tab...`);
+      const tab2 = page.locator('button:has-text("Custom assistant message")');
+      const t2Box = await tab2.boundingBox();
+      if (t2Box) {
+        await humanGlide(page, t2Box.x + t2Box.width / 2, t2Box.y + t2Box.height / 2, 20);
+        await humanClick(page);
+      }
+      await sleep(1200);
+      const inputLocator2 = page.locator('textarea, input[type="text"], [contenteditable="true"]').first();
+      const inputBox2 = await inputLocator2.boundingBox();
+      if (inputBox2) {
+        await humanGlide(page, inputBox2.x + 80, inputBox2.y + inputBox2.height / 2, 20);
+        await humanClick(page);
+      }
+      const prompt2 = 'Explain custom assistant message rendering.';
+      for (const c of prompt2) await page.keyboard.type(c, { delay: 45 });
+      await sleep(400);
+      await page.keyboard.press('Enter');
+      console.log(`   Waiting for Custom Assistant Message response...`);
+      await sleep(8000);
 
-    // Type with natural keystroke cadence
-    for (const char of config.prompt) {
-      await page.keyboard.type(char, { delay: 45 });
-    }
-    await sleep(600);
+      console.log(`   [Chat UI] 3/4: Demonstrating Popup surface...`);
+      const tab3 = page.locator('button:has-text("Popup")');
+      const t3Box = await tab3.boundingBox();
+      if (t3Box) {
+        await humanGlide(page, t3Box.x + t3Box.width / 2, t3Box.y + t3Box.height / 2, 20);
+        await humanClick(page);
+      }
+      await sleep(1500);
+      // Glide mouse to center of the opened popup window
+      await humanGlide(page, 1600, 700, 25);
+      console.log(`   Popup open — showcasing floating chat surface...`);
+      await sleep(4000);
 
-    // Move mouse towards Send button and click
-    try {
-      const sendBtn = page.locator('button[type="submit"], button:has-text("Send"), .copilotKitSendButton').first();
-      if (await sendBtn.isVisible()) {
-        const btnBox = await sendBtn.boundingBox();
-        if (btnBox) {
-          await humanGlide(page, btnBox.x + btnBox.width / 2, btnBox.y + btnBox.height / 2, 20);
-          await humanClick(page);
-        } else {
-          await sendBtn.click();
-        }
+      console.log(`   [Chat UI] 4/4: Demonstrating Sidebar surface...`);
+      const tab4 = page.locator('button:has-text("Sidebar")');
+      const t4Box = await tab4.boundingBox();
+      if (t4Box) {
+        await humanGlide(page, t4Box.x + t4Box.width / 2, t4Box.y + t4Box.height / 2, 20);
+        await humanClick(page);
+      }
+      await sleep(1500);
+      // Glide mouse to center of the opened docked sidebar
+      await humanGlide(page, 1680, 500, 25);
+      console.log(`   Sidebar open — showcasing 480px docked panel...`);
+      await sleep(4000);
+
+    } else if (config.id === 'attachments') {
+      // --------------------------------------------------
+      // ATTACHMENTS DEMO: Click attachment button, upload sample file, and prompt
+      // --------------------------------------------------
+      console.log(`   [Attachments] Uploading sample document and prompting...`);
+      const sampleFilePath = join(ROOT, 'sample_report.pdf');
+      if (!existsSync(sampleFilePath)) {
+        writeFileSync(sampleFilePath, '%PDF-1.4 sample test document for copilotkit attachments');
+      }
+
+      // Locate attachment upload button and file input
+      const fileInput = page.locator('input[type="file"]').first();
+      const attachBtn = page.locator('button:has-text("+"), button[aria-label*="attach"], button[aria-label*="Upload"], .copilotKitAttachmentButton, button:has(svg path[d*="M12 4v16"])').first();
+      const attachBox = await attachBtn.boundingBox().catch(() => null);
+      if (attachBox) {
+        await humanGlide(page, attachBox.x + attachBox.width / 2, attachBox.y + attachBox.height / 2, 20);
+        await humanClick(page);
+      }
+
+      if (await fileInput.count() > 0) {
+        await fileInput.setInputFiles(sampleFilePath);
+      }
+      await sleep(1500);
+
+      // Focus input, type prompt, and send
+      const inputLocator = page.locator('textarea, input[type="text"], [contenteditable="true"]').first();
+      const inputBox = await inputLocator.boundingBox();
+      if (inputBox) {
+        await humanGlide(page, inputBox.x + 80, inputBox.y + inputBox.height / 2, 20);
+        await humanClick(page);
+      }
+      const prompt = 'Please review and summarize this attached document.';
+      for (const c of prompt) await page.keyboard.type(c, { delay: 45 });
+      await sleep(400);
+      await page.keyboard.press('Enter');
+      console.log(`   Waiting for Attachments AI response...`);
+      await sleep(9000);
+
+    } else if (config.id === 'voice-multimodal') {
+      // --------------------------------------------------
+      // VOICE DEMO: Click microphone icon and showcase voice activation / permission
+      // --------------------------------------------------
+      console.log(`   [Voice] Activating microphone control...`);
+      const micBtn = page.locator('button[aria-label*="mic"], button[aria-label*="voice"], button:has(svg path[d*="M12 2a3"]), button:has(svg)').last();
+      await micBtn.waitFor({ timeout: 6000 });
+      const micBox = await micBtn.boundingBox();
+      if (micBox) {
+        await humanGlide(page, micBox.x + micBox.width / 2, micBox.y + micBox.height / 2, 25);
+        await humanClick(page);
       } else {
+        await micBtn.click();
+      }
+      console.log(`   Microphone activated — holding active voice state...`);
+      await sleep(5500);
+
+    } else {
+      // --------------------------------------------------
+      // STANDARD DEMO: Type prompt and wait for response
+      // --------------------------------------------------
+      const inputLocator = page.locator('textarea, input[type="text"], [contenteditable="true"]').first();
+      await inputLocator.waitFor({ timeout: 8000 });
+
+      const inputBox = await inputLocator.boundingBox();
+      if (inputBox) {
+        await humanGlide(page, inputBox.x + 80, inputBox.y + inputBox.height / 2, 25);
+        await humanClick(page);
+      } else {
+        await inputLocator.click();
+      }
+      await sleep(400);
+
+      for (const char of config.prompt) {
+        await page.keyboard.type(char, { delay: 45 });
+      }
+      await sleep(600);
+
+      try {
+        const sendBtn = page.locator('button[type="submit"], button:has-text("Send"), .copilotKitSendButton').first();
+        if (await sendBtn.isVisible()) {
+          const btnBox = await sendBtn.boundingBox();
+          if (btnBox) {
+            await humanGlide(page, btnBox.x + btnBox.width / 2, btnBox.y + btnBox.height / 2, 20);
+            await humanClick(page);
+          } else {
+            await sendBtn.click();
+          }
+        } else {
+          await page.keyboard.press('Enter');
+        }
+      } catch {
         await page.keyboard.press('Enter');
       }
-    } catch {
-      await page.keyboard.press('Enter');
+
+      console.log(`⏳ Waiting for AI agent response / tool rendering...`);
+      await humanGlide(page, 960, 500, 30);
+      await sleep(config.waitAfterPromptMs ?? 9500);
     }
-
-    console.log(`⏳ Waiting for AI agent response / tool rendering...`);
-    // Glide mouse back to reading area
-    await humanGlide(page, 960, 500, 30);
-
-    // Wait for response
-    await sleep(config.waitAfterPromptMs ?? 9500);
 
     console.log(`✅ Demo execution completed for ${config.id}.`);
     await sleep(3500);
