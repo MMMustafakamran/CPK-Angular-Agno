@@ -635,10 +635,25 @@ startxref
       }
       const prompt = 'Please review and summarize this attached document.';
       for (const c of prompt) await page.keyboard.type(c, { delay: 45 });
-      await sleep(400);
-      await page.keyboard.press('Enter');
+      console.log(`   Prompt entered — holding 4s to showcase attached document and text...`);
+      await sleep(4000);
+
+      // Glide mouse to Send button and click
+      try {
+        const sendBtn = page.locator('button[type="submit"], button[aria-label="Send message"], button:has-text("Send")').first();
+        const btnBox = await sendBtn.boundingBox().catch(() => null);
+        if (btnBox) {
+          await humanGlide(page, btnBox.x + btnBox.width / 2, btnBox.y + btnBox.height / 2, 20);
+          await humanClick(page);
+        } else {
+          await page.keyboard.press('Enter');
+        }
+      } catch {
+        await page.keyboard.press('Enter');
+      }
+
       console.log(`   Waiting for Attachments AI response...`);
-      await sleep(9000);
+      await sleep(10000);
 
     } else if (config.id === 'voice-multimodal') {
       // --------------------------------------------------
