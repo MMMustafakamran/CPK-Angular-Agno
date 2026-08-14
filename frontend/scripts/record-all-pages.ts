@@ -259,6 +259,92 @@ async function humanScrollDown(page: Page, totalPixels: number = 550, speedMs: n
 }
 
 
+/** Injects an authentic Windows 11 Notepad window and types developer notes character-by-character */
+async function showNotepadNote(page: Page, title: string, textLines: string[]): Promise<void> {
+  console.log(`📝 Opening Notepad: ${title}...`);
+
+  await page.evaluate(`
+    (function() {
+      var existing = document.getElementById('win11-notepad-overlay');
+      if (existing) existing.remove();
+
+      var np = document.createElement('div');
+      np.id = 'win11-notepad-overlay';
+      np.style.cssText = 'position:fixed!important;top:130px!important;left:50%!important;transform:translateX(-50%)!important;width:760px!important;height:380px!important;background:#202020!important;border:1px solid rgba(255,255,255,0.15)!important;border-radius:8px!important;box-shadow:0 24px 60px rgba(0,0,0,0.85),0 0 0 1px rgba(255,255,255,0.08)!important;z-index:2147483640!important;display:flex!important;flex-direction:column!important;font-family:Segoe UI,sans-serif!important;overflow:hidden!important;animation:notepadPop 0.3s cubic-bezier(0.16,1,0.3,1)!important;';
+
+      np.innerHTML = [
+        '<style>@keyframes notepadPop{from{opacity:0;transform:translate(-50%,20px) scale(0.96);}to{opacity:1;transform:translate(-50%,0) scale(1);}}</style>',
+        // Titlebar
+        '<div style="height:38px;background:#2b2b2b;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid rgba(255,255,255,0.08);user-select:none;">',
+        '  <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#e5e5e5;font-weight:500;">',
+        '    <svg width="16" height="16" viewBox="0 0 24 24" fill="#60a5fa"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>',
+        '    <span>' + ${JSON.stringify(title)} + ' - Notepad</span>',
+        '  </div>',
+        '  <div style="display:flex;align-items:center;gap:12px;color:#a3a3a3;font-size:11px;">',
+        '    <span>&#x2500;</span><span>&#x25A1;</span><span style="color:#ef4444;font-size:13px;font-weight:bold;">&#x2715;</span>',
+        '  </div>',
+        '</div>',
+        // Menu Bar
+        '<div style="height:26px;background:#202020;display:flex;align-items:center;gap:16px;padding:0 14px;font-size:11px;color:#a3a3a3;border-bottom:1px solid rgba(255,255,255,0.06);user-select:none;">',
+        '  <span>File</span><span>Edit</span><span>View</span>',
+        '</div>',
+        // Text Content Area
+        '<div id="notepad-content-body" style="flex:1;padding:16px;background:#1e1e1e;color:#f3f3f3;font-family:Consolas,Courier New,monospace;font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-y:auto;"></div>'
+      ].join('');
+
+      document.documentElement.appendChild(np);
+    })()
+  `);
+
+  // Move mouse smoothly onto the Notepad window and focus
+  await humanGlide(page, 960, 240, 20);
+  await humanClick(page);
+  await sleep(400);
+
+  // Type characters with human cadence: variable delays, punctuation pauses, and thinking pauses
+  const fullText = textLines.join('\n');
+  for (let i = 0; i < fullText.length; i++) {
+    const char = fullText[i];
+    await page.evaluate(`
+      (function() {
+        var el = document.getElementById('notepad-content-body');
+        if (el) {
+          el.textContent = ${JSON.stringify(fullText.slice(0, i + 1))} + ' |';
+        }
+      })()
+    `);
+
+    // Natural variable delay based on character type and human rhythm
+    let delay = 65 + Math.floor(Math.random() * 45); // 65ms - 110ms base keystroke
+
+    if (char === '\n') {
+      delay = 380 + Math.floor(Math.random() * 140); // Newline thought pause: 380-520ms
+    } else if (char === '.' || char === ':' || char === '!' || char === '?') {
+      delay = 280 + Math.floor(Math.random() * 120); // Sentence boundary pause: 280-400ms
+    } else if (char === ',' || char === ';' || char === '•') {
+      delay = 180 + Math.floor(Math.random() * 80);  // Clause/bullet pause: 180-260ms
+    } else if (char === ' ') {
+      delay = 90 + Math.floor(Math.random() * 40);   // Word boundary: 90-130ms
+    } else if (Math.random() < 0.035) {
+      delay = 240 + Math.floor(Math.random() * 160); // Occasional thinking hesitation
+    }
+
+    await sleep(delay);
+  }
+
+  // Remove blinking caret at the end
+  await page.evaluate(`
+    (function() {
+      var el = document.getElementById('notepad-content-body');
+      if (el) {
+        el.textContent = ${JSON.stringify(fullText)};
+      }
+    })()
+  `);
+
+  await sleep(4500);
+}
+
 async function recordPage(config: PageRecordConfig): Promise<void> {
   console.log(`\n======================================================`);
   console.log(`🎬 RECORDING: ${config.name} (${config.id})`);
@@ -538,7 +624,7 @@ startxref
 
     } else if (config.id === 'voice-multimodal') {
       // --------------------------------------------------
-      // VOICE DEMO: Click microphone icon and showcase voice activation / permission
+      // VOICE DEMO: Click microphone icon, showcase voice activation, and open Notepad note
       // --------------------------------------------------
       console.log(`   [Voice] Activating microphone control...`);
       const micBtn = page.locator('button[aria-label="Transcribe"], button[aria-label*="Transcribe"], button[aria-label*="mic"], button[aria-label*="voice"]').first();
@@ -551,7 +637,18 @@ startxref
         await micBtn.click();
       }
       console.log(`   Microphone activated — holding active voice state...`);
-      await sleep(5500);
+      await sleep(3500);
+
+      // Open Notepad to type the developer note slowly
+      await showNotepadNote(page, 'Voice_Evaluation_Note.txt', [
+        'Developer Notes: Voice & Multimodal Input',
+        '--------------------------------------------------',
+        '• Browser Status: Microphone recording & audio capture works natively in browser.',
+        '• Server Status:  No STT / TTS audio transcription service is implemented on backend.',
+        '• Runtime Config: audioFileTranscriptionEnabled is set to false by design.',
+        '',
+        'Summary: Frontend audio controls verified; server-side transcription intentionally skipped.'
+      ]);
 
     } else {
       // --------------------------------------------------
