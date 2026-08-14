@@ -2,18 +2,15 @@
  * Automated Screen Recording & Demonstration Pipeline
  *
  * For each doc page, this script:
- * 1. Opens the official CopilotKit doc URL, scrolls to and spotlights the code snippet.
- * 2. Opens the full-screen VS Code IDE view with project file tree, active tab, and highlighted lines.
- * 3. Opens the clean frontend demo (/demo), types the test prompt, and captures the streaming AI / tool output.
- * 4. Exports pristine 1080p MP4 videos into `./recordings/`.
- *
- * Usage:
- *   npx tsx scripts/record-all-pages.ts                # Records all pages
- *   npx tsx scripts/record-all-pages.ts --page=quickstart # Records one specific page
+ * 1. Shows a visible moving mouse cursor with natural movement physics.
+ * 2. Navigates to the official CopilotKit doc URL, scrolls down naturally, and spotlights the code snippet.
+ * 3. Switches to the VS Code IDE view, clicks the file in the explorer, scrolls through code, and highlights lines.
+ * 4. Switches to the clean frontend demo (/demo), clicks the input, types the prompt with natural keystroke cadence, clicks Send, and captures the streaming AI / tool output.
+ * 5. Exports pristine 1080p MP4 videos into `./recordings/`.
  */
 
 import { chromium, type Page } from 'playwright';
-import { execSync, spawn } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, renameSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -143,15 +140,67 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/** Smoothly scrolls the window down in human-like steps */
-async function smoothScrollDown(page: Page, totalPixels: number = 600, durationMs: number = 2500): Promise<void> {
-  const steps = 30;
-  const distancePerStep = totalPixels / steps;
-  const interval = durationMs / steps;
+/** Injects a visible OS mouse cursor arrow that moves naturally during screen recordings */
+async function installVirtualMouse(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const injectCursor = () => {
+      if (document.getElementById('playwright-virtual-mouse')) return;
+      const cursor = document.createElement('div');
+      cursor.id = 'playwright-virtual-mouse';
+      cursor.style.position = 'fixed';
+      cursor.style.top = '0';
+      cursor.style.left = '0';
+      cursor.style.width = '24px';
+      cursor.style.height = '24px';
+      cursor.style.zIndex = '2147483647';
+      cursor.style.pointerEvents = 'none';
+      cursor.style.transform = 'translate(-2px, -2px)';
+      cursor.style.transition = 'transform 0.04s ease-out';
+      cursor.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 2px 5px rgba(0,0,0,0.6));">
+          <path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87c.45 0 .67-.54.35-.85L6.35 2.86a.5.5 0 0 0-.85.35Z" fill="#ffffff" stroke="#111111" stroke-width="1.5"/>
+        </svg>
+      `;
+      document.documentElement.appendChild(cursor);
 
+      window.addEventListener('mousemove', (e) => {
+        cursor.style.left = `${e.clientX}px`;
+        cursor.style.top = `${e.clientY}px`;
+      }, { passive: true });
+
+      window.addEventListener('mousedown', () => {
+        cursor.style.transform = 'translate(-2px, -2px) scale(0.82)';
+      }, { passive: true });
+
+      window.addEventListener('mouseup', () => {
+        cursor.style.transform = 'translate(-2px, -2px) scale(1)';
+      }, { passive: true });
+    };
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', injectCursor);
+    } else {
+      injectCursor();
+    }
+  });
+}
+
+/** Smooth human-like curved mouse glide */
+async function humanGlide(page: Page, targetX: number, targetY: number, steps: number = 25): Promise<void> {
+  await page.mouse.move(targetX, targetY, { steps });
+}
+
+/** Smooth human scroll down using both physical wheel and scrollBy */
+async function humanScrollDown(page: Page, totalPixels: number = 600, speedMs: number = 70): Promise<void> {
+  const steps = Math.floor(totalPixels / 50);
   for (let i = 0; i < steps; i++) {
-    await page.evaluate((dist) => window.scrollBy({ top: dist, behavior: 'smooth' }), distancePerStep);
-    await sleep(interval);
+    await page.mouse.wheel(0, 50);
+    await page.evaluate(() => {
+      window.scrollBy({ top: 50, behavior: 'smooth' });
+      const main = document.querySelector('main, article, [class*="overflow-y-auto"]');
+      if (main) main.scrollBy({ top: 50, behavior: 'smooth' });
+    });
+    await sleep(speedMs);
   }
 }
 
@@ -160,7 +209,6 @@ async function spotlightElement(page: Page, selector: string): Promise<void> {
   await page.evaluate((sel) => {
     const el = document.querySelector(sel);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       (el as HTMLElement).style.outline = '4px solid #6366f1';
       (el as HTMLElement).style.outlineOffset = '6px';
       (el as HTMLElement).style.boxShadow = '0 0 35px rgba(99, 102, 241, 0.7)';
@@ -176,7 +224,11 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
 
   const browser = await chromium.launch({
     headless: false,
-    args: ['--start-maximized', '--force-dark-mode'],
+    args: [
+      '--start-maximized',
+      '--force-dark-mode',
+      '--background-color=#1e1e1e',
+    ],
   });
 
   const context = await browser.newContext({
@@ -189,28 +241,41 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
   });
 
   const page = await context.newPage();
+  await installVirtualMouse(page);
 
-  // Prevent white flash during transitions
+  // Zero-white-flash: force dark canvas on every navigation
   await page.addInitScript(() => {
+    const style = document.createElement('style');
+    style.innerHTML = 'html, body { background-color: #1e1e1e !important; }';
+    document.head?.appendChild(style);
     document.documentElement.style.backgroundColor = '#1e1e1e';
   });
 
   try {
     // ----------------------------------------------------
-    // STEP 1: DOC PAGE & SMOOTH SCROLL TO CODE SNIPPET
+    // STEP 1: DOC PAGE & NATURAL HUMAN MOVEMENT
     // ----------------------------------------------------
     console.log(`\n📖 Step 1: Navigating to Official Doc (${config.docUrl})...`);
     try {
       await page.goto(config.docUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
-      await sleep(1500);
+      await sleep(1000);
 
-      // Human-like smooth scroll down the doc page
-      console.log(`   Scrolling down doc page to show code snippet...`);
-      await smoothScrollDown(page, 500, 2200);
+      // Move mouse into reading position
+      await humanGlide(page, 960, 450, 30);
+      await sleep(400);
 
-      // Highlight code block
+      // Natural smooth scrolling down the doc page
+      console.log(`   Human-like scrolling down doc page...`);
+      await humanScrollDown(page, 550, 70);
+      await sleep(500);
+
+      // Move mouse over the code snippet
       const hasCode = await page.$('pre, code, div[class*="code"]');
       if (hasCode) {
+        const box = await hasCode.boundingBox();
+        if (box) {
+          await humanGlide(page, box.x + box.width / 2, box.y + 40, 25);
+        }
         await spotlightElement(page, 'pre, code, div[class*="code"]');
       }
       await sleep(3500);
@@ -220,12 +285,22 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
     }
 
     // ----------------------------------------------------
-    // STEP 2: SHOW PROJECT CODE IN IDE & SMOOTH SCROLL
+    // STEP 2: SHOW PROJECT CODE IN IDE WITH ACTIVE SELECTION
     // ----------------------------------------------------
     console.log(`\n💻 Step 2: Displaying Project Code in IDE (${config.ideFile}:${config.ideLine})...`);
     const ideUrl = `http://localhost:4200/ide?file=${encodeURIComponent(config.ideFile)}&line=${config.ideLine}`;
     await page.goto(ideUrl, { waitUntil: 'networkidle', timeout: 10000 });
-    await sleep(1000);
+    await sleep(800);
+
+    // Move mouse over the Explorer on the left
+    await humanGlide(page, 160, 220, 20);
+    await page.mouse.down();
+    await sleep(120);
+    await page.mouse.up();
+    await sleep(400);
+
+    // Glide mouse into the code editor
+    await humanGlide(page, 650, 400, 25);
 
     // Smoothly scroll down inside the editor to the target line
     await page.evaluate((targetLine) => {
@@ -236,6 +311,9 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
       }
     }, config.ideLine);
 
+    // Move cursor over the highlighted code block
+    await humanGlide(page, 520, 480, 20);
+
     // Also trigger VS Code desktop goto if available
     try {
       execSync(`code -r -g "${config.ideFile}:${config.ideLine}"`, { stdio: 'ignore' });
@@ -244,37 +322,60 @@ async function recordPage(config: PageRecordConfig): Promise<void> {
     await sleep(4500);
 
     // ----------------------------------------------------
-    // STEP 3: FRONTEND DEMO & PROMPT EXECUTION
+    // STEP 3: FRONTEND DEMO & ACTIVE PROMPT EXECUTION
     // ----------------------------------------------------
     console.log(`\n🚀 Step 3: Opening Demo and Sending Prompt (${config.prompt})...`);
     await page.goto(config.demoUrl, { waitUntil: 'networkidle', timeout: 10000 });
-    await sleep(2000);
+    await sleep(1500);
 
     // Locate chat input in CopilotChat or headless textarea
     const inputLocator = page.locator('textarea, input[type="text"], [contenteditable="true"]').first();
     await inputLocator.waitFor({ timeout: 8000 });
-    await inputLocator.click();
+
+    const inputBox = await inputLocator.boundingBox();
+    if (inputBox) {
+      // Glide mouse to the chat input box and click
+      await humanGlide(page, inputBox.x + 80, inputBox.y + inputBox.height / 2, 25);
+      await page.mouse.down();
+      await sleep(100);
+      await page.mouse.up();
+    } else {
+      await inputLocator.click();
+    }
+    await sleep(400);
 
     // Type with natural keystroke cadence
     for (const char of config.prompt) {
       await page.keyboard.type(char, { delay: 45 });
     }
-    await sleep(500);
+    await sleep(600);
 
-    // Send the message
-    await page.keyboard.press('Enter');
-
-    // Also click send button if available
+    // Move mouse towards Send button and click
     try {
       const sendBtn = page.locator('button[type="submit"], button:has-text("Send"), .copilotKitSendButton').first();
       if (await sendBtn.isVisible()) {
-        await sendBtn.click();
+        const btnBox = await sendBtn.boundingBox();
+        if (btnBox) {
+          await humanGlide(page, btnBox.x + btnBox.width / 2, btnBox.y + btnBox.height / 2, 20);
+          await page.mouse.down();
+          await sleep(120);
+          await page.mouse.up();
+        } else {
+          await sendBtn.click();
+        }
+      } else {
+        await page.keyboard.press('Enter');
       }
-    } catch {}
+    } catch {
+      await page.keyboard.press('Enter');
+    }
 
     console.log(`⏳ Waiting for AI agent response / tool rendering...`);
+    // Glide mouse back to reading area
+    await humanGlide(page, 960, 500, 30);
+
     // Wait for response
-    await sleep(config.waitAfterPromptMs ?? 9000);
+    await sleep(config.waitAfterPromptMs ?? 9500);
 
     console.log(`✅ Demo execution completed for ${config.id}.`);
     await sleep(3500);
