@@ -13,24 +13,47 @@ export const runThreadsAction: PageActionHandler = async (
   _config: PageRecordConfig,
 ) => {
   console.log(
-    `   🧵 [Threads Action]: Testing headless threads, drawer sidebar & typing developer evaluation in Notepad...`,
+    `   🧵 [Threads Action]: Describing issue at start, testing headless threads & drawer, chatting, and elaborating at end...`,
   );
 
-  // 1. Wait for thread demo components to mount
+  // 1. Wait for thread demo components to mount on left
   const threadList = page.locator('app-thread-list').first();
   await threadList.waitFor({ state: 'visible', timeout: 15000 });
-  await sleep(800);
+  await sleep(600);
 
-  // 2. Test the Headless list (injectThreads)
+  // 2. Open Notepad on the right at the start to describe the issue slightly
+  console.log(`   📝 Opening Notepad to describe initial threads issue...`);
+  await openNotepadWindow(page, 'threads-issue.txt', {
+    right: '28px',
+    top: '95px',
+    width: '640px',
+    height: '560px',
+  });
+
+  await typeInNotepad(
+    page,
+    [
+      'threads error',
+      '',
+      'integrated ThreadListComponent and CopilotThreadsDrawer from copilot-kit-angular',
+      '- headless list keeps showing "Loading conversations..." and no threads',
+      '- drawer sidebar does not open or show any thread list',
+    ],
+    1550,
+    280,
+  );
+  await sleep(1500);
+
+  // 3. Test the Headless list on the left (injectThreads)
   console.log(`   👉 Testing Headless thread list (injectThreads)...`);
   const newBtn = page.locator('app-thread-list button:has-text("New conversation")').first();
   if (await newBtn.isVisible({ timeout: 4000 }).catch(() => false)) {
     const box = await newBtn.boundingBox();
     if (box) {
       await humanGlide(page, box.x + box.width / 2, box.y + box.height / 2, 22);
-      await sleep(300);
+      await sleep(250);
       await humanClick(page);
-      await sleep(1500);
+      await sleep(1000);
     }
   }
 
@@ -40,26 +63,26 @@ export const runThreadsAction: PageActionHandler = async (
     const rBox = await retryBtn.boundingBox();
     if (rBox) {
       await humanGlide(page, rBox.x + rBox.width / 2, rBox.y + rBox.height / 2, 20);
-      await sleep(300);
+      await sleep(250);
       await humanClick(page);
-      await sleep(1200);
+      await sleep(1000);
     }
   }
 
-  // 3. Test CopilotThreadsDrawer (show that nothing happens / empty state)
+  // 4. Test CopilotThreadsDrawer (show that drawer remains empty / closed)
   console.log(`   👉 Testing CopilotThreadsDrawer sidebar...`);
   const drawerEl = page.locator('copilot-threads-drawer').first();
   if (await drawerEl.isVisible({ timeout: 4000 }).catch(() => false)) {
     const dBox = await drawerEl.boundingBox();
     if (dBox) {
-      await humanGlide(page, dBox.x + 40, dBox.y + 30, 22);
-      await sleep(400);
+      await humanGlide(page, dBox.x + 30, dBox.y + 30, 22);
+      await sleep(350);
       await humanClick(page);
-      await sleep(1500);
+      await sleep(1200);
     }
   }
 
-  // 4. Test live chat conversation beside the drawer
+  // 5. Test live chat conversation beside the drawer
   console.log(`   👉 Testing agent chat conversation...`);
   const chatTextarea = page
     .locator('app-conversations textarea.copilot-chat-textarea, app-conversations textarea')
@@ -75,7 +98,7 @@ export const runThreadsAction: PageActionHandler = async (
 
     const testPrompt = 'Hello! Can you help me test multi-turn thread conversations?';
     await chatTextarea.pressSequentially(testPrompt, { delay: 35 });
-    await sleep(400);
+    await sleep(350);
 
     // Guarantee Angular signal receives the input event
     await page.evaluate((text) => {
@@ -111,7 +134,7 @@ export const runThreadsAction: PageActionHandler = async (
     await waitForAgentResponseCompletion(page, 4000);
   }
 
-  // 5. Glide cursor over completed agent response
+  // 6. Glide cursor over completed agent response
   const lastMsg = page
     .locator(
       'app-conversations copilot-chat-assistant-message, app-conversations .copilot-chat-message-assistant, app-conversations [data-role="assistant"]',
@@ -125,24 +148,15 @@ export const runThreadsAction: PageActionHandler = async (
     }
   }
 
-  // 6. Open Windows 11 Notepad and type informal developer notes
-  console.log(`   📝 Opening Notepad to type informal developer notes...`);
-  await openNotepadWindow(page, 'threads-issue.txt', {
-    right: '32px',
-    top: '95px',
-    width: '680px',
-    height: '560px',
-  });
-
+  // 7. Elaborate in Notepad at the end with full technical context
+  console.log(`   📝 Elaborating full technical context in Notepad at end...`);
   await typeInNotepad(
     page,
     [
-      'threads error',
       '',
-      'integrated ThreadList and CopilotThreadsDrawer from copilot-kit-angular',
-      '- headless list just shows Loading conversations... and no threads',
-      '- drawer sidebar doesnt open or show any threads',
-      '- chat with agent works fine but threads drawer is not showing anything',
+      '- agent chat responds, but threads are not registered / saved',
+      '- backend lacks cloud authentication / intelligence key',
+      '- thread mutations & persistence cannot sync to frontend',
       '',
       'pkgs:',
       '@angular/cdk 22',
@@ -150,14 +164,14 @@ export const runThreadsAction: PageActionHandler = async (
       '@copilotkit/runtime 1.68.1',
     ],
     1550,
-    280,
+    380,
   );
 
-  // 7. Reading pause on the completed note
-  console.log(`   📖 Pausing for reading typed Notepad error report...`);
+  // 8. Reading pause on the elaborated note
+  console.log(`   📖 Pausing for reading complete elaborated error report...`);
   await sleep(5000);
 
-  // 8. Smoothly close Notepad overlay
+  // 9. Smoothly close Notepad overlay
   await closeNotepadNote(page);
   await sleep(1200);
 };
