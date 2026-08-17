@@ -21,5 +21,10 @@ backend/__pycache__/
 backend/agno.db
 *.db
 
+# Recordings & Autorecord
+autorecord/node_modules/
+autorecord/videos/*.webm
+autorecord/videos/.temp_chunks/
+
 # OS
 .DS_Store
