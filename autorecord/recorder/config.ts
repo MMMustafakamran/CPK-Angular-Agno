@@ -48,6 +48,7 @@ export const PAGES: PageRecordConfig[] = [
     demoUrl: 'http://localhost:4200/a2ui/demo',
     prompt: 'Show me a card comparing two flight options.',
     waitAfterPromptMs: 4000,
+    docOnly: true,
   },
   {
     id: 'voice-multimodal',

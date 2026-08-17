@@ -5,122 +5,228 @@ import {
   openNotepadWindow,
   typeInNotepad,
 } from '../overlays/notepad';
-import { waitForAgentResponseCompletion } from './index';
 import { type PageActionHandler, type PageRecordConfig } from '../types';
+
+/**
+ * Naturally selects text on the page by dragging the mouse across it
+ * with authentic bluish selection styling.
+ */
+async function selectTextWithMouse(
+  page: Page,
+  targetKeyword: string,
+  containerKeyword?: string,
+): Promise<boolean> {
+  const box = await page.evaluate(
+    ({ kw, parentKw }) => {
+      // Find matching span or text element
+      const figures = Array.from(document.querySelectorAll('figure, pre'));
+      let container: Element | null = null;
+
+      if (parentKw) {
+        for (const f of figures) {
+          if (f.textContent && f.textContent.includes(parentKw)) {
+            container = f;
+            break;
+          }
+        }
+      }
+
+      const searchRoot = container || document.body;
+      const spans = Array.from(searchRoot.querySelectorAll('span, code, p, div'));
+      let targetEl: HTMLElement | null = null;
+
+      for (const s of spans) {
+        const txt = (s.textContent || '').trim();
+        if (txt === kw || (s.children.length === 0 && txt.includes(kw))) {
+          targetEl = s as HTMLElement;
+          break;
+        }
+      }
+
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const rect = targetEl.getBoundingClientRect();
+        return {
+          x: rect.left,
+          y: rect.top,
+          width: rect.width,
+          height: rect.height,
+          found: true,
+        };
+      }
+
+      return { x: 0, y: 0, width: 0, height: 0, found: false };
+    },
+    { kw: targetKeyword, parentKw: containerKeyword },
+  );
+
+  if (!box || !box.found || box.width === 0) return false;
+
+  await sleep(400);
+
+  // Glide cursor to start of text
+  const startX = Math.max(10, box.x - 4);
+  const startY = box.y + box.height / 2;
+  const endX = box.x + box.width + 6;
+  const endY = startY;
+
+  await humanGlide(page, startX, startY, 22);
+  await sleep(150);
+
+  // Mouse down and drag across
+  await page.mouse.down();
+
+  // Highlight style injected during drag
+  await page.evaluate(
+    ({ kw, parentKw }) => {
+      const figures = Array.from(document.querySelectorAll('figure, pre'));
+      let container: Element | null = null;
+      if (parentKw) {
+        for (const f of figures) {
+          if (f.textContent && f.textContent.includes(parentKw)) {
+            container = f;
+            break;
+          }
+        }
+      }
+      const searchRoot = container || document.body;
+      const spans = Array.from(searchRoot.querySelectorAll('span, code'));
+      for (const s of spans) {
+        const txt = (s.textContent || '').trim();
+        if (txt === kw || (s.children.length === 0 && txt.includes(kw))) {
+          const el = s as HTMLElement;
+          el.style.transition = 'background 0.2s ease';
+          el.style.background = '#2563eb';
+          el.style.color = '#ffffff';
+          el.style.borderRadius = '3px';
+          el.style.padding = '1px 4px';
+          el.style.boxShadow = '0 0 10px rgba(37, 99, 235, 0.7)';
+        }
+      }
+    },
+    { kw: targetKeyword, parentKw: containerKeyword },
+  );
+
+  // Drag mouse smoothly across the word
+  await humanGlide(page, endX, endY, 16);
+  await sleep(150);
+  await page.mouse.up();
+  await sleep(400);
+
+  return true;
+}
 
 export const runA2uiAction: PageActionHandler = async (
   page: Page,
-  config: PageRecordConfig,
+  _config: PageRecordConfig,
 ) => {
   console.log(
-    `   🎨 [A2UI Action]: Testing declarative A2UI demo, chat prompt & typing developer evaluation in Notepad...`,
+    `   🎨 [A2UI Interleaved Doc Presentation]: Highlighting snippets naturally with cursor and typing notes in Notepad step-by-step...`,
   );
 
-  // 1. Wait for the chat composer to be visible in A2UI demo
-  const inputLocator = page
-    .locator('textarea, input[type="text"], [contenteditable="true"]')
-    .first();
-  await inputLocator.waitFor({ state: 'visible', timeout: 15000 });
-  await sleep(600);
-
-  // 2. Focus input and type test prompt
-  const inputBox = await inputLocator.boundingBox();
-  if (inputBox) {
-    console.log(`   👉 Focusing A2UI chat input...`);
-    await humanGlide(
-      page,
-      inputBox.x + 80,
-      inputBox.y + inputBox.height / 2,
-      22,
-    );
-    await humanClick(page);
-  } else {
-    await inputLocator.click();
-  }
-  await sleep(400);
-
-  const prompt = config.prompt || 'Show me a card comparing two flight options.';
-  for (const char of prompt) {
-    await page.keyboard.type(char, { delay: 40 });
-  }
+  // 1. Initial header reading
   await sleep(500);
+  await humanGlide(page, 520, 260, 22);
+  await sleep(1200);
 
-  // 3. Submit prompt via Send button
-  const sendBtn = page
-    .locator(
-      'button[aria-label*="Send message" i], button[aria-label*="Send" i], button[type="submit"], button:has-text("Send"), .copilotKitSendButton',
-    )
-    .first();
-
-  if (await sendBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-    const btnBox = await sendBtn.boundingBox();
-    if (btnBox) {
-      console.log(`   👉 Clicking Send button...`);
-      await humanGlide(
-        page,
-        btnBox.x + btnBox.width / 2,
-        btnBox.y + btnBox.height / 2,
-        20,
-      );
-      await humanClick(page);
-    } else {
-      await sendBtn.click();
-    }
-  } else {
-    await page.keyboard.press('Enter');
-  }
-
-  // 4. Wait for agent token streaming and response completion
-  await waitForAgentResponseCompletion(page, 4000);
-
-  // 5. Glide cursor over completed agent response (showing prose text instead of generative card)
-  const lastMsg = page
-    .locator('.copilotKitAssistantMessage, [data-message-role="assistant"], [data-role="assistant"]')
-    .last();
-  if (await lastMsg.isVisible({ timeout: 3000 }).catch(() => false)) {
-    const msgBox = await lastMsg.boundingBox();
-    if (msgBox) {
-      console.log(`   🎯 Focusing cursor on agent response...`);
-      await humanGlide(page, msgBox.x + 60, msgBox.y + 40, 22);
-      await sleep(1500);
-    }
-  }
-
-  // 6. Open Windows 11 Notepad and type developer evaluation note
-  console.log(`   📝 Opening Notepad to type developer evaluation notes...`);
-  await openNotepadWindow(page, 'a2ui-issue.txt', {
+  // 2. Open Notepad window on the right side of the screen
+  await openNotepadWindow(page, 'a2ui-notes.txt', {
     right: '32px',
     top: '95px',
     width: '680px',
     height: '560px',
   });
 
+  // Type header in Notepad
+  await typeInNotepad(page, [
+    'a2ui docs error',
+    '',
+  ], 1550, 240);
+  await sleep(500);
+
+  // 3. Highlight Snippet 1: dynamicString in fixedDefinitions
+  console.log(`   👉 Step 1: Selecting dynamicString in fixedDefinitions...`);
+  await selectTextWithMouse(page, 'dynamicString', 'fixedDefinitions');
+  await sleep(800);
+
+  // Type note 1 in Notepad
+  console.log(`   📝 Typing Note 1 in Notepad...`);
   await typeInNotepad(
     page,
     [
-      'a2ui error / limitation:',
-      '',
-      '- runtime middleware is enabled (a2ui: {})',
-      '- chat conversation streams response in plain prose text',
-      '- A2UI declarative card does not render because frontend catalog is missing',
-      '- the official guide references undefined catalogs (beautifulCatalog, declarativeCatalog, fixedCatalog) and dynamicString',
-      '- without a complete createCatalog definition, the agent cannot generate declarative A2UI components',
-      '',
-      'pkgs:',
-      '@angular/core: 22.1.x',
-      '@copilotkit/angular: 0.3.1',
-      '@copilotkit/runtime: 1.67.1',
-      '@ag-ui/agno: 0.0.5',
+      'code examples are incomplete',
+      '- fixedDefinitions uses undefined dynamicString',
     ],
     1550,
-    280,
+    300,
   );
+  await sleep(600);
 
-  // 7. Reading pause on the completed note
-  console.log(`   📖 Pausing for reading typed Notepad error report...`);
+  // 4. Highlight Snippet 2: beautifulCatalog, declarativeCatalog, fixedCatalog
+  console.log(`   👉 Step 2: Selecting undefined catalogs in a2uiConfigForFeature...`);
+  await selectTextWithMouse(page, 'beautifulCatalog', 'a2uiConfigForFeature');
+  await sleep(350);
+  await selectTextWithMouse(page, 'declarativeCatalog', 'a2uiConfigForFeature');
+  await sleep(350);
+  await selectTextWithMouse(page, 'fixedCatalog', 'a2uiConfigForFeature');
+  await sleep(800);
+
+  // Type note 2 in Notepad
+  console.log(`   📝 Typing Note 2 in Notepad...`);
+  await typeInNotepad(
+    page,
+    [
+      '- in a2ui-catalogs.ts beautifulCatalog, declarativeCatalog and fixedCatalog are used but not defined anywhere',
+    ],
+    1550,
+    360,
+  );
+  await sleep(600);
+
+  // 5. Highlight Snippet 3: productCatalog in app.config.ts
+  console.log(`   👉 Step 3: Selecting productCatalog in app.config.ts...`);
+  await selectTextWithMouse(page, 'productCatalog', 'provideCopilotKit');
+  await sleep(800);
+
+  // Type note 3 in Notepad
+  console.log(`   📝 Typing Note 3 in Notepad...`);
+  await typeInNotepad(
+    page,
+    [
+      '- app.config.ts has undefined productCatalog',
+    ],
+    1550,
+    420,
+  );
+  await sleep(600);
+
+  // 6. Highlight Snippet 4: styles.css classes
+  console.log(`   👉 Step 4: Selecting styles.css classes...`);
+  await selectTextWithMouse(page, '.a2ui-row', 'styles.css');
+  await sleep(350);
+  await selectTextWithMouse(page, '.a2ui-flight-card', 'styles.css');
+  await sleep(800);
+
+  // Type note 4 & conclusion in Notepad
+  console.log(`   📝 Typing conclusion in Notepad...`);
+  await typeInNotepad(
+    page,
+    [
+      '- only fixed schema and styles.css given',
+      '',
+      'need at least one full catalog definition in docs so components can render',
+    ],
+    1550,
+    480,
+  );
+  await sleep(1000);
+
+  // 7. Reading pause on the completed Notepad notes
+  console.log(`   📖 Pausing for reading completed Notepad notes...`);
+  await humanGlide(page, 1550, 360, 20);
   await sleep(5000);
 
-  // 8. Smoothly close Notepad overlay
+  // 8. Close Notepad window
   await closeNotepadNote(page);
   await sleep(1200);
 };

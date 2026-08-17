@@ -137,46 +137,25 @@ export class RecordingEngine {
     });
 
     try {
-      if (config.docOnly) {
-        // ----------------------------------------------------
-        // DOC-ONLY PRESENTATION MODE
-        // ----------------------------------------------------
-        console.log(
-          `\n📖 [Doc-Only Presentation Mode]: Navigating to Official Doc (${config.docUrl})...`,
-        );
-        try {
-          await page.goto(config.docUrl, {
-            waitUntil: 'domcontentloaded',
-            timeout: 30000,
-          });
-          await page.waitForSelector('body', { timeout: 10000 }).catch(() => {});
-          await ensureOverlays(page, 'chrome');
-          await sleep(400);
+      // ----------------------------------------------------
+      // STEP 1: OFFICIAL DOC PAGE & HUMAN READING SCROLL
+      // ----------------------------------------------------
+      console.log(`\n📖 Step 1: Navigating to Official Doc (${config.docUrl})...`);
+      try {
+        await page.goto(config.docUrl, {
+          waitUntil: 'domcontentloaded',
+          timeout: 30000,
+        });
+        await page.waitForSelector('body', { timeout: 10000 }).catch(() => {});
+        await ensureOverlays(page, 'chrome');
+        await sleep(400);
 
+        if (config.id === 'a2ui') {
+          console.log(`   🎨 [A2UI]: Running interleaved doc highlight & Notepad evaluation notes...`);
           await executePageAction(page, config, this.rootDir);
-
-          console.log(`✅ Doc-only demo execution completed for ${config.id}.`);
-          await sleep(2000);
-        } catch (e) {
-          console.warn(
-            `⚠️ Doc-only presentation notice (${config.docUrl}): ${diagnoseError(e, 'doc-page')}`,
-          );
-          await sleep(1000);
-        }
-      } else {
-        // ----------------------------------------------------
-        // STEP 1: OFFICIAL DOC PAGE & HUMAN READING SCROLL
-        // ----------------------------------------------------
-        console.log(`\n📖 Step 1: Navigating to Official Doc (${config.docUrl})...`);
-        try {
-          await page.goto(config.docUrl, {
-            waitUntil: 'domcontentloaded',
-            timeout: 30000,
-          });
-          await page.waitForSelector('body', { timeout: 10000 }).catch(() => {});
-          await ensureOverlays(page, 'chrome');
-          await sleep(400);
-
+          console.log(`   🖱️ Switching to VS Code via Windows 11 Taskbar...`);
+          await clickTaskbarApp(page, 'vscode');
+        } else {
           // Move mouse into reading position
           await humanGlide(page, 960, 450, 22);
           await sleep(200);
@@ -199,77 +178,81 @@ export class RecordingEngine {
           // Switch to VS Code via Windows 11 Taskbar
           console.log(`   🖱️ Switching to VS Code via Windows 11 Taskbar...`);
           await clickTaskbarApp(page, 'vscode');
-        } catch (e) {
-          console.warn(`⚠️ Doc navigation notice (${config.docUrl}): ${diagnoseError(e, 'doc-page')}`);
-          await sleep(1000);
         }
+      } catch (e) {
+        console.warn(`⚠️ Doc navigation notice (${config.docUrl}): ${diagnoseError(e, 'doc-page')}`);
+        await sleep(1000);
+      }
 
-        // ----------------------------------------------------
-        // STEP 2: SHOW PROJECT CODE IN VS CODE IDE WITH SNIPPET SELECTION
-        // ----------------------------------------------------
-        if (config.id === 'quickstart') {
-          console.log(
-            `\n💻 Step 2a: Displaying CopilotKit & AG-UI Versions in package.json (lines 19-36)...`,
-          );
-          try {
-            const pkgHtml = generateIdeHtml(
-              this.rootDir,
-              'frontend/package.json',
-              19,
-              36,
-            );
-            await page.setContent(pkgHtml, { waitUntil: 'domcontentloaded' });
-            await ensureOverlays(page, 'vscode');
-            await sleep(400);
-            await humanGlide(page, 520, 380, 22);
-            await sleep(200);
-            await humanGlide(page, 720, 480, 25);
-            await sleep(2500);
-          } catch (e) {
-            console.warn(`⚠️ Package.json IDE view notice: ${diagnoseError(e, 'ide-simulation')}`);
-          }
-        }
-
+      // ----------------------------------------------------
+      // STEP 2: SHOW PROJECT CODE IN VS CODE IDE WITH SNIPPET SELECTION
+      // ----------------------------------------------------
+      if (config.id === 'quickstart') {
         console.log(
-          `\n💻 Step 2: Displaying Project Code in VS Code IDE (${config.ideFile}: lines ${config.startLine}-${config.endLine})...`,
+          `\n💻 Step 2a: Displaying CopilotKit & AG-UI Versions in package.json (lines 19-36)...`,
         );
         try {
-          const ideHtml = generateIdeHtml(
+          const pkgHtml = generateIdeHtml(
             this.rootDir,
-            config.ideFile,
-            config.startLine,
-            config.endLine,
+            'frontend/package.json',
+            19,
+            36,
           );
-          await page.setContent(ideHtml, { waitUntil: 'domcontentloaded' });
+          await page.setContent(pkgHtml, { waitUntil: 'domcontentloaded' });
           await ensureOverlays(page, 'vscode');
           await sleep(400);
-
-          // Move mouse over the Explorer header
-          await humanGlide(page, 120, 70, 18);
-          await sleep(200);
-
-          // Glide mouse into the code editor at the start of the snippet
           await humanGlide(page, 520, 380, 22);
           await sleep(200);
-
-          // Smoothly glide cursor down across the highlighted snippet block
-          await humanGlide(page, 720, 540, 25);
-
-          // Non-blocking fire-and-forget local VS Code desktop focus if available
-          try {
-            exec(`code -r -g "${config.ideFile}:${config.startLine}"`);
-          } catch {}
-
+          await humanGlide(page, 720, 480, 25);
           await sleep(2500);
+        } catch (e) {
+          console.warn(`⚠️ Package.json IDE view notice: ${diagnoseError(e, 'ide-simulation')}`);
+        }
+      }
 
+      console.log(
+        `\n💻 Step 2: Displaying Project Code in VS Code IDE (${config.ideFile}: lines ${config.startLine}-${config.endLine})...`,
+      );
+      try {
+        const ideHtml = generateIdeHtml(
+          this.rootDir,
+          config.ideFile,
+          config.startLine,
+          config.endLine,
+        );
+        await page.setContent(ideHtml, { waitUntil: 'domcontentloaded' });
+        await ensureOverlays(page, 'vscode');
+        await sleep(400);
+
+        // Move mouse over the Explorer header
+        await humanGlide(page, 120, 70, 18);
+        await sleep(200);
+
+        // Glide mouse into the code editor at the start of the snippet
+        await humanGlide(page, 520, 380, 22);
+        await sleep(200);
+
+        // Smoothly glide cursor down across the highlighted snippet block
+        await humanGlide(page, 720, 540, 25);
+
+        // Non-blocking fire-and-forget local VS Code desktop focus if available
+        try {
+          exec(`code -r -g "${config.ideFile}:${config.startLine}"`);
+        } catch {}
+
+        await sleep(2500);
+
+        if (!config.docOnly) {
           // Switch back to Chrome via Windows 11 Taskbar
           console.log(`   🖱️ Switching back to Chrome via Windows 11 Taskbar...`);
           await clickTaskbarApp(page, 'chrome');
-        } catch (e) {
-          console.warn(`⚠️ IDE view error: ${diagnoseError(e, 'ide-simulation')}`);
-          await sleep(1000);
         }
+      } catch (e) {
+        console.warn(`⚠️ IDE view error: ${diagnoseError(e, 'ide-simulation')}`);
+        await sleep(1000);
+      }
 
+      if (!config.docOnly) {
         // ----------------------------------------------------
         // STEP 3: FRONTEND DEMO PAGE & TAILORED ACTION EXECUTION
         // ----------------------------------------------------
@@ -298,11 +281,11 @@ export class RecordingEngine {
           console.log(`✅ Demo execution completed for ${config.id}.`);
           await sleep(2000);
         } catch (e) {
-          console.warn(
-            `\n⚠️ [Demo Action Notice on ${config.id}]:\n${diagnoseError(e, config.demoUrl)}\n`,
-          );
+          console.log(`\n⚠️ [Demo Action Notice on ${config.id}]:\n${diagnoseError(e, config.demoUrl)}\n`);
           await sleep(1000);
         }
+      } else {
+        console.log(`\n✅ Completed documentation & code showcase for ${config.id}.`);
       }
     } finally {
       const video = page.video();
