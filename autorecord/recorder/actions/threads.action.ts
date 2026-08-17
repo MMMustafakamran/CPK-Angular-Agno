@@ -77,9 +77,22 @@ export const runThreadsAction: PageActionHandler = async (
     await chatTextarea.pressSequentially(testPrompt, { delay: 35 });
     await sleep(400);
 
+    // Guarantee Angular signal receives the input event
+    await page.evaluate((text) => {
+      const textarea = document.querySelector('app-conversations textarea') as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.value = text;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        textarea.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }, testPrompt);
+    await sleep(300);
+
     // Click Send button
     const sendBtn = page
-      .locator('app-conversations button.copilot-chat-send-button, app-conversations button[type="submit"]')
+      .locator(
+        'app-conversations copilot-chat-send-button button, app-conversations button.copilot-chat-send-button, app-conversations button[aria-label*="Send" i], app-conversations button[type="submit"]',
+      )
       .first();
     if (await sendBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
       const sBox = await sendBtn.boundingBox();
@@ -99,18 +112,21 @@ export const runThreadsAction: PageActionHandler = async (
   }
 
   // 5. Glide cursor over completed agent response
-  const lastMsg = page.locator('app-conversations .copilot-chat-message-assistant').last();
+  const lastMsg = page
+    .locator(
+      'app-conversations copilot-chat-assistant-message, app-conversations .copilot-chat-message-assistant, app-conversations [data-role="assistant"]',
+    )
+    .last();
   if (await lastMsg.isVisible({ timeout: 3000 }).catch(() => false)) {
     const msgBox = await lastMsg.boundingBox();
     if (msgBox) {
-      console.log(`   🎯 Focusing cursor on agent response...`);
       await humanGlide(page, msgBox.x + 60, msgBox.y + 40, 22);
       await sleep(1500);
     }
   }
 
-  // 6. Open Windows 11 Notepad and type developer evaluation notes
-  console.log(`   📝 Opening Notepad to type developer evaluation notes...`);
+  // 6. Open Windows 11 Notepad and type informal developer notes
+  console.log(`   📝 Opening Notepad to type informal developer notes...`);
   await openNotepadWindow(page, 'threads-issue.txt', {
     right: '32px',
     top: '95px',
@@ -121,19 +137,17 @@ export const runThreadsAction: PageActionHandler = async (
   await typeInNotepad(
     page,
     [
-      'threads error / limitation:',
+      'threads error',
       '',
-      '- integrated ThreadListComponent (injectThreads) and CopilotThreadsDrawer',
-      '- headless list shows "Loading conversations..." / no threads returned',
-      '- CopilotThreadsDrawer sidebar shows locked state (requires CopilotKit Enterprise Intelligence license)',
-      '- chat conversation with Agno agent works properly, but thread management is unlicensed',
+      'integrated ThreadList and CopilotThreadsDrawer from copilot-kit-angular',
+      '- headless list just shows Loading conversations... and no threads',
+      '- drawer sidebar doesnt open or show any threads',
+      '- chat with agent works fine but threads drawer is not showing anything',
       '',
       'pkgs:',
-      '@angular/core: 22.1.x',
-      '@angular/cdk: 22.1.x',
-      '@copilotkit/angular: 0.3.1',
-      '@copilotkit/runtime: 1.67.1',
-      '@ag-ui/agno: 0.0.5',
+      '@angular/cdk 22',
+      '@copilotkit/angular 0.3.1',
+      '@copilotkit/runtime 1.68.1',
     ],
     1550,
     280,
