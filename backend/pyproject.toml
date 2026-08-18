@@ -8,6 +8,7 @@ dependencies = [
     "ag-ui-protocol>=0.1.19",
     "agno>=2.8.7",
     "fastapi>=0.141.1",
+    "jsonpatch>=1.33",
     "openai>=3.0.0",
     "python-dotenv>=1.2.2",
     "python-multipart>=0.0.32",

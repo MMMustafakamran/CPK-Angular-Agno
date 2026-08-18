@@ -32,11 +32,11 @@ const ASSISTANT_SELECTORS = [
  * Actively waits until:
  * 1. An assistant response message appears with text content or tool rendering.
  * 2. Streaming finishes (text content stops changing for 2+ seconds).
- * 3. Glides the mouse over the response and waits postWaitMs (default 4000ms) for reading.
+ * 3. Glides the mouse over the response and waits postWaitMs (default 7000ms) for reading.
  */
 export async function waitForAgentResponseCompletion(
   page: Page,
-  postWaitMs = 4000,
+  postWaitMs = 7000,
 ): Promise<void> {
   console.log(`   ⏳ Actively detecting AI agent response start & streaming progress...`);
 
@@ -94,7 +94,7 @@ export async function waitForAgentResponseCompletion(
     }
   } else {
     console.warn(`   ⚠️ AI agent response timeout (waiting fallback)...`);
-    await sleep(4000);
+    await sleep(7000);
   }
 
   // Step 3: Glide cursor smoothly to the finished response message

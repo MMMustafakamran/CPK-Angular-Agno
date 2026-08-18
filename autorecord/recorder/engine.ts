@@ -91,7 +91,11 @@ export class RecordingEngine {
       if (
         msg.includes('reo.dev') ||
         msg.includes('removeChild') ||
-        msg.includes('ResizeObserver')
+        msg.includes('ResizeObserver') ||
+        msg.includes('Minified React error') ||
+        msg.includes('hydrat') ||
+        msg.includes('posthog') ||
+        msg.includes('sentry')
       ) {
         return;
       }
@@ -106,7 +110,10 @@ export class RecordingEngine {
         if (
           !txt.includes('favicon.ico') &&
           !txt.includes('reo.dev') &&
-          !txt.includes('analytics')
+          !txt.includes('analytics') &&
+          !txt.includes('posthog') &&
+          !txt.includes('Minified React error') &&
+          !txt.includes('hydrat')
         ) {
           console.warn(`   ⚠️ [Browser Console Error]: ${txt}`);
         }
@@ -234,18 +241,13 @@ export class RecordingEngine {
 
         // Smoothly glide cursor down across the highlighted snippet block
         await humanGlide(page, 720, 540, 25);
-
-        // Non-blocking fire-and-forget local VS Code desktop focus if available
-        try {
-          exec(`code -r -g "${config.ideFile}:${config.startLine}"`);
-        } catch {}
-
         await sleep(2500);
 
         if (!config.docOnly) {
           // Switch back to Chrome via Windows 11 Taskbar
           console.log(`   🖱️ Switching back to Chrome via Windows 11 Taskbar...`);
           await clickTaskbarApp(page, 'chrome');
+          await sleep(300);
         }
       } catch (e) {
         console.warn(`⚠️ IDE view error: ${diagnoseError(e, 'ide-simulation')}`);
@@ -259,7 +261,7 @@ export class RecordingEngine {
         console.log(`\n🚀 Step 3: Opening Angular Demo (${config.demoUrl})...`);
         try {
           await page.goto(config.demoUrl, {
-            waitUntil: 'commit',
+            waitUntil: 'domcontentloaded',
             timeout: 45000,
           });
           await ensureOverlays(page, 'chrome');
