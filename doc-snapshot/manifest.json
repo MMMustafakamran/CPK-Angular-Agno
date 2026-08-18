@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "docsRoot": "https://docs.copilotkit.ai/angular/agno",
+  "syncedAt": "2026-08-18T06:22:24.165Z",
+  "pages": {
+    "/angular/agno": {
+      "file": "angular__agno.md",
+      "sha256": "82a3de99e1102f8f661b968526db6fc1748f69268a6e8d7cf3065c218d667a4d",
+      "bytes": 6721,
+      "lines": 172,
+      "routes": [
+        "/",
+        "/doc-sync"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Tue, 18 Aug 2026 06:22:24 GMT"
+    },
+    "/angular/agno/guides/a2ui": {
+      "file": "angular__agno__guides__a2ui.md",
+      "sha256": "ba3b762208ac6a9163339d301a641668b59cdd1a86e5601eb0c751b7375bbf50",
+      "bytes": 5825,
+      "lines": 195,
+      "routes": [
+        "/a2ui"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Tue, 18 Aug 2026 06:22:24 GMT"
+    },
+    "/angular/agno/guides/chat-ui": {
+      "file": "angular__agno__guides__chat-ui.md",
+      "sha256": "dfb259dcf11afc57ba30f29372455184f9964b8a76039c327d2ac8de9789b3ba",
+      "bytes": 5125,
+      "lines": 178,
+      "routes": [
+        "/chat-ui"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Tue, 18 Aug 2026 06:22:24 GMT"
+    },
+    "/angular/agno/guides/frontend-tools-generative-ui": {
+      "file": "angular__agno__guides__frontend-tools-generative-ui.md",
+      "sha256": "c5d9e9df71adee5970f398c2efb48f7d14006c81ec1fe24eb5f75a894a001488",
+      "bytes": 5726,
+      "lines": 178,
+      "routes": [
+        "/frontend-tools-generative-ui"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Tue, 18 Aug 2026 06:22:25 GMT"
+    },
+    "/angular/agno/guides/human-in-the-loop": {
+      "file": "angular__agno__guides__human-in-the-loop.md",
+      "sha256": "5bce3046e882c02dc132958b5a9566939b9d1b27408095cf28c4dc2aa84aa41c",
+      "bytes": 7170,
+      "lines": 227,
+      "routes": [
+        "/human-in-the-loop"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Tue, 18 Aug 2026 06:22:24 GMT"
+    },
+    "/angular/agno/guides/shared-state": {
+      "file": "angular__agno__guides__shared-state.md",
+      "sha256": "1c0a7ae749212806686a784306807dcd95b0adac035d5be57f856f9408c3530b",
+      "bytes": 4720,
+      "lines": 151,
+      "routes": [
+        "/shared-state"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Tue, 18 Aug 2026 06:22:24 GMT"
+    },
+    "/angular/agno/guides/threads-memory-attachments-headless": {
+      "file": "angular__agno__guides__threads-memory-attachments-headless.md",
+      "sha256": "f446bfb56b3f43c992225d2106e45d4deaf5244e2b441b8bae3cae1e2186028f",
+      "bytes": 8928,
+      "lines": 302,
+      "routes": [
+        "/threads",
+        "/memory",
+        "/attachments",
+        "/headless"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Tue, 18 Aug 2026 06:22:25 GMT"
+    },
+    "/angular/agno/guides/voice-multimodal": {
+      "file": "angular__agno__guides__voice-multimodal.md",
+      "sha256": "727df2a6b9bd950db6365ccd7ec0dd3442e985f983305590627c1de5b521f8f9",
+      "bytes": 3776,
+      "lines": 111,
+      "routes": [
+        "/voice-multimodal"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Tue, 18 Aug 2026 06:22:25 GMT"
+    },
+    "/angular/agno/quickstart": {
+      "file": "angular__agno__quickstart.md",
+      "sha256": "82a3de99e1102f8f661b968526db6fc1748f69268a6e8d7cf3065c218d667a4d",
+      "bytes": 6721,
+      "lines": 172,
+      "routes": [
+        "/quickstart"
+      ],
+      "status": "ok",
+      "age": 0,
+      "date": "Tue, 18 Aug 2026 06:22:25 GMT"
+    }
+  },
+  "sitemap": {
+    "fetchedAt": "2026-08-18T06:22:24.165Z",
+    "urlsUnderRoot": 3,
+    "knownUnmapped": [
+      "https://docs.copilotkit.ai/angular/agno/ag-ui",
+      "https://docs.copilotkit.ai/angular/agno/copilot-runtime"
+    ]
+  }
+}
