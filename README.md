@@ -252,45 +252,66 @@ Verified 2026-08-12 against a live stack (real OpenAI key, no license key).
 
 ## 9. Automated Screen Recording Pipeline
 
-This project includes a dedicated, fully automated 1080p video recording engine in [`autorecord/`](file:///c:/Users/dynamic%20computer/Desktop/work/FIQROS/optimized-malaika/agno-angular/autorecord) powered by Playwright. It automates end-to-end screen recordings for all documentation routes and guides.
+Screen recording lives in [`autorecorder/`](autorecorder/) — a portable
+Playwright suite shared across the CopilotKit framework repos and adapted to this
+one. It produces one 1080p `.webm` per doc page: read the doc, switch to a
+simulated VS Code and show the code that implements it, switch back to the
+browser and drive the live feature.
 
-### Standard 3-Step Walkthrough per Page
-Each recording systematically captures:
-1. **Official Doc Walkthrough** (`https://docs.copilotkit.ai/angular/agno/...`): Smooth mouse-wheel scrolling down the documentation with reading cadence.
-2. **Project Code in IDE**: Pure HTML/CSS VS Code Dark+ simulator displaying the source file with highlighted code ranges and gliding cursor.
-3. **Interactive Demo Execution** (`/<page>/demo`): Opens the clean, chrome-free demo surface and performs authentic human interactions (chat prompts, token-stream stability detection, tool cards, attachment uploads, tab switches, and slide-up Windows 11 Notepad developer evaluation notes).
+> The older [`autorecord/`](autorecord/) folder is the **legacy** recorder kept
+> for reference only. It is not maintained; everything below refers to
+> `autorecorder/`.
 
-### Presentation Simulation Features
-- **Windows 11 Taskbar**: Pinned frosted-glass taskbar overlay with Start menu, search, active app indicators (switching between Chrome and VS Code), system tray, and a **live local ticking clock & date**.
-- **Visible OS Mouse Cursor**: Curved Bézier mouse gliding (`humanGlide`) with realistic click-depression animations.
-- **Zero White Flash**: Pre-warmed dark theme canvas transitions between all pages.
+### Standard 3-step walkthrough per page
+1. **Doc page** (`https://docs.copilotkit.ai/angular/agno/...`) — smooth scrolling
+   at reading cadence, cursor resting on a code block.
+2. **Project code** — a VS Code Dark+ simulator rendering this repo's own source
+   from disk, Shiki-highlighted, with the page's line range selected. Multi-file
+   pages switch tabs.
+3. **Live demo** (`/<page>/demo`) — the chrome-free demo surface, driven with a
+   visible cursor: prompts typed key by key, token-stream completion detection,
+   tool cards, approval clicks, attachment uploads, tab switches, and a Windows 11
+   Notepad window for pages whose finding is a limitation rather than a feature.
 
-### How to Run
+### How to run
 
-Ensure the backend (`localhost:8000`), runtime (`localhost:8200`), and frontend (`localhost:4200`) are running, then run from the `autorecord/` directory:
+The backend (`:8000`), the Copilot Runtime (`:8200`) and the Angular dev server
+(`:4200`) must all be up — the recorder refuses to start otherwise.
 
 ```bash
-cd autorecord
-
-# Record all configured pages in sequence
-npm run record
-
-# Record any specific page individually
-npm run record -- --page=quickstart
-npm run record -- --page=chat-ui
-npm run record -- --page=frontend-tools-generative-ui
-npm run record -- --page=a2ui
-npm run record -- --page=voice-multimodal
-npm run record -- --page=human-in-the-loop
-npm run record -- --page=shared-state
-npm run record -- --page=threads
-npm run record -- --page=attachments
-npm run record -- --page=headless
+cd backend  && uv run main.py     # :8000
+cd frontend && npm run dev        # runtime :8200 + ng serve :4200
 ```
 
-### Video Output Location
-All recordings are saved directly as high-definition `.webm` video files in:
-👉 `autorecord/videos/AGNO-angular - <NN><FeatureName>.webm`
+Then:
+
+```bash
+cd autorecorder
+npm install
+npx playwright install chromium
+
+npm run doctor              # is the configuration sane? exits non-zero if not
+npm run doctor:online       # also probes every doc/demo URL and the selectors
+npm run record -- --list    # what will be recorded
+npm run record -- --quickstart   # one page
+npm run record              # all 11, in nav order
+npm run manifest            # record what the run produced (commit the result)
+```
+
+### Output
+
+`autorecorder/videos/AGNO-angular-<NN>-<FeatureName>.webm`, 1920x1080.
+
+`videos/` is **gitignored** — recordings are build output. What is committed is
+`videos/manifest.json` and `videos/MANIFEST.md`, which record each clip's hash,
+the source files it shows, and whether it has gone stale against them.
+
+Three pages record a documented limitation rather than a working feature and say
+so on screen: `a2ui` (the guide's catalog snippets are not self-contained),
+`voice-multimodal` (no transcription service configured) and `threads` (licensed
+endpoints, unlicensed runtime). See
+[`autorecorder/README.md`](autorecorder/README.md) for the full scope table and
+[`autorecorder/ADAPT.md`](autorecorder/ADAPT.md) for the porting contract.
 
 ---
 

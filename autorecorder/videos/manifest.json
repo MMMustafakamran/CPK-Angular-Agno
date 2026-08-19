@@ -1,0 +1,171 @@
+{
+  "generatedAt": "2026-08-19T19:00:59.523Z",
+  "framework": "Agno (Python) + Angular",
+  "videoPrefix": "AGNO-angular",
+  "clips": {
+    "quickstart": {
+      "order": 1,
+      "id": "quickstart",
+      "name": "Quickstart",
+      "file": "AGNO-angular-01-Quickstart.webm",
+      "sources": [
+        "frontend/package.json",
+        "frontend/src/app/features/quickstart/quickstart-chat.ts",
+        "frontend/server.ts",
+        "backend/main.py"
+      ],
+      "sourceSha": "ccdd77c2edaf",
+      "recordedAt": "2026-08-19T18:10:44.591Z",
+      "bytes": 4886183,
+      "sha256": "413aa726361e",
+      "status": "drifted",
+      "because": "source hash a8139f1661cb -> ccdd77c2edaf since last manifest"
+    },
+    "chat-ui": {
+      "order": 2,
+      "id": "chat-ui",
+      "name": "Guides - Chat UI and customization",
+      "file": "AGNO-angular-02-ChatUi.webm",
+      "sources": [
+        "frontend/src/app/features/chat-ui/chat-ui-demo.component.ts",
+        "frontend/src/app/features/chat-ui/custom-assistant-message.component.ts"
+      ],
+      "sourceSha": "d6639fe60522",
+      "recordedAt": "2026-08-19T18:12:32.823Z",
+      "bytes": 7626096,
+      "sha256": "991bdfaa5606",
+      "status": "new"
+    },
+    "frontend-tools-generative-ui": {
+      "order": 3,
+      "id": "frontend-tools-generative-ui",
+      "name": "Guides - Frontend tools and generative UI",
+      "file": "AGNO-angular-03-FrontendToolsGenerativeUi.webm",
+      "sources": [
+        "frontend/src/app/features/tools/tools-chat.component.ts",
+        "frontend/src/app/features/tools/weather-card.component.ts"
+      ],
+      "sourceSha": "830a2c98b26d",
+      "recordedAt": "2026-08-19T18:14:15.831Z",
+      "bytes": 6500985,
+      "sha256": "b96afc225389",
+      "status": "new"
+    },
+    "a2ui": {
+      "order": 4,
+      "id": "a2ui",
+      "name": "Guides - A2UI schemas, styling, and recovery",
+      "file": "AGNO-angular-04-A2ui.webm",
+      "sources": [
+        "frontend/src/app/features/a2ui/a2ui-chat.component.ts",
+        "frontend/server.ts"
+      ],
+      "sourceSha": "e2d994ef90f2",
+      "recordedAt": "2026-08-19T18:16:33.628Z",
+      "bytes": 8607896,
+      "sha256": "f9183d31da69",
+      "status": "new"
+    },
+    "voice-multimodal": {
+      "order": 5,
+      "id": "voice-multimodal",
+      "name": "Guides - Voice and multimodal input",
+      "file": "AGNO-angular-05-VoiceMultimodal.webm",
+      "sources": [
+        "frontend/src/app/features/media/voice-chat.component.ts"
+      ],
+      "sourceSha": "2bd750aa6f0a",
+      "recordedAt": "2026-08-19T18:20:38.349Z",
+      "bytes": 7252993,
+      "sha256": "4e83da4e5ff0",
+      "status": "new"
+    },
+    "human-in-the-loop": {
+      "order": 6,
+      "id": "human-in-the-loop",
+      "name": "Guides - Human-in-the-loop and interrupts",
+      "file": "AGNO-angular-06-HumanInTheLoop.webm",
+      "sources": [
+        "frontend/src/app/features/hitl/approval-tools.service.ts",
+        "frontend/src/app/features/hitl/approval-card.component.ts"
+      ],
+      "sourceSha": "016761310c3c",
+      "recordedAt": "2026-08-19T18:22:13.792Z",
+      "bytes": 4279643,
+      "sha256": "a45b6c4e2bfd",
+      "status": "drifted",
+      "because": "source hash 55570cbc9c53 -> 016761310c3c since last manifest"
+    },
+    "shared-state": {
+      "order": 7,
+      "id": "shared-state",
+      "name": "Guides - Shared state and agent context",
+      "file": "AGNO-angular-07-SharedState.webm",
+      "sources": [
+        "frontend/src/app/features/shared-state/workspace.component.ts"
+      ],
+      "sourceSha": "d6d7f0e66c28",
+      "recordedAt": "2026-08-19T18:23:17.040Z",
+      "bytes": 3579140,
+      "sha256": "a6bf5942c1e1",
+      "status": "new"
+    },
+    "threads": {
+      "order": 8,
+      "id": "threads",
+      "name": "Threads",
+      "file": "AGNO-angular-08-Threads.webm",
+      "sources": [
+        "frontend/src/app/features/threads/thread-list.component.ts",
+        "frontend/src/app/features/threads/threads-demo.component.ts"
+      ],
+      "sourceSha": "df38cc95b7cc",
+      "recordedAt": "2026-08-19T18:25:02.849Z",
+      "bytes": 5590879,
+      "sha256": "6a78b70458a8",
+      "status": "new"
+    },
+    "memory": {
+      "order": 9,
+      "id": "memory",
+      "name": "Memory",
+      "file": "AGNO-angular-09-Memory.webm",
+      "sources": [
+        "frontend/src/app/features/memory/memory-list.component.ts"
+      ],
+      "sourceSha": "2cb800afef67",
+      "recordedAt": "2026-08-19T18:26:05.474Z",
+      "bytes": 4055010,
+      "sha256": "5c9c2bbcd022",
+      "status": "new"
+    },
+    "attachments": {
+      "order": 10,
+      "id": "attachments",
+      "name": "Attachments",
+      "file": "AGNO-angular-10-Attachments.webm",
+      "sources": [
+        "frontend/src/app/features/attachments/media-chat.component.ts"
+      ],
+      "sourceSha": "207f32e0e9c2",
+      "recordedAt": "2026-08-19T18:27:02.083Z",
+      "bytes": 3314446,
+      "sha256": "6e705f78d216",
+      "status": "new"
+    },
+    "headless": {
+      "order": 11,
+      "id": "headless",
+      "name": "Headless UI",
+      "file": "AGNO-angular-11-HeadlessUi.webm",
+      "sources": [
+        "frontend/src/app/features/headless/headless-chat.component.ts"
+      ],
+      "sourceSha": "85b0ff48591e",
+      "recordedAt": "2026-08-19T18:27:58.226Z",
+      "bytes": 3737118,
+      "sha256": "21bc98a22b26",
+      "status": "new"
+    }
+  }
+}
