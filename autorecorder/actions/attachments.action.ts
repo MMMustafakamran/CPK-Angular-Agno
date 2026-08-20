@@ -1,38 +1,77 @@
 /**
- * Attachments — attach a file the way a person does, then ask about it.
+ * Attachments — pick a real file, send it, and make the agent prove it read it.
  *
  * https://docs.copilotkit.ai/angular/agno/guides/threads-memory-attachments-headless
  *
- * The picker is a native OS dialog, which Playwright cannot film. So the cursor
- * really does travel to the "+" control and open the CDK menu — that part is
- * the video — and the file itself is then placed on the `input[type=file]`
- * through a DataTransfer, which is the same event the dialog would have raised.
+ * Three things this had to get right, because the earlier version got all three
+ * wrong and the video showed it:
  *
- * The fixture is a 1x1 PNG written at record time rather than committed: this
- * config has `enabled: true` with no `onUpload`, so the file is inlined as
- * base64 into the message, and a real screenshot would be a large payload for
- * no gain. Nothing here inspects the image.
+ * 1. **The composer has no `input[type=file]` in the DOM.** It creates one on
+ *    demand when the menu item is clicked, so writing a DataTransfer onto
+ *    "the file input" silently attached nothing at all — which is why the agent
+ *    had no idea what it was being asked about. The file now arrives through
+ *    Playwright's `filechooser` interception: the same event the native dialog
+ *    raises, so the upload path is the real one.
+ *
+ * 2. **The Windows dialog cannot be filmed.** It is an OS window outside the
+ *    viewport and Playwright suppresses it, so a file appeared out of nowhere.
+ *    `file-dialog.ts` draws one and the cursor picks the file in it; the dialog
+ *    is a prop, the bytes are not.
+ *
+ * 3. **A 1x1 PNG proves nothing.** The fixture is now a legible chart rendered
+ *    on a canvas, and the prompt asks for values only readable from the image —
+ *    so a correct answer is evidence the file reached the model, and a wrong one
+ *    is a real failure rather than something to squint at.
  */
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { type Page } from 'playwright';
+import { type FileChooser, type Page } from 'playwright';
 
 import { sendPrompt, waitForAgentResponseCompletion } from '../core/actions';
 import { humanClick, humanGlide, sleep } from '../core/overlays/cursor';
 import { type PageActionHandler, type PageRecordConfig } from '../core/types';
 
-/** A valid 1x1 PNG. */
-const DUMMY_PNG_BASE64 =
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+import { closeFileDialog, openFileDialog, pickFileInDialog } from './file-dialog';
 
-const FIXTURE_NAME = 'sample_chart.png';
+const FIXTURE_NAME = 'quarterly_revenue.png';
 
-/** Writes the fixture into `autorecorder/assets/` and returns its base64. */
-function ensureFixture(rootPath: string): string {
+/**
+ * Renders the fixture on a canvas in the page and returns its bytes.
+ *
+ * Drawn rather than committed so the repo carries no binary, and so the values
+ * the prompt asks about live next to the code that draws them.
+ */
+async function renderFixture(page: Page, rootPath: string): Promise<Buffer> {
+  const dataUrl = await page.evaluate(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 640;
+    canvas.height = 400;
+    const g = canvas.getContext('2d')!;
+    g.fillStyle = '#ffffff';
+    g.fillRect(0, 0, 640, 400);
+    g.fillStyle = '#111827';
+    g.font = 'bold 30px sans-serif';
+    g.fillText('Quarterly revenue', 30, 52);
+
+    const values = [120, 180, 240, 300];
+    values.forEach((v, i) => {
+      g.fillStyle = '#2563eb';
+      g.fillRect(40 + i * 150, 380 - v, 100, v);
+      g.fillStyle = '#111827';
+      g.font = '20px sans-serif';
+      g.fillText(`Q${i + 1} ${v}`, 44 + i * 150, 372 - v);
+    });
+    return canvas.toDataURL('image/png');
+  });
+
+  const buffer = Buffer.from(dataUrl.split(',')[1], 'base64');
+
+  // Also written to disk so the fixture can be opened and checked by hand.
   const dir = join(rootPath, 'autorecorder', 'assets');
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, FIXTURE_NAME), Buffer.from(DUMMY_PNG_BASE64, 'base64'));
-  return DUMMY_PNG_BASE64;
+  writeFileSync(join(dir, FIXTURE_NAME), buffer);
+
+  return buffer;
 }
 
 export const runAttachmentsAction: PageActionHandler = async (
@@ -40,66 +79,69 @@ export const runAttachmentsAction: PageActionHandler = async (
   config: PageRecordConfig,
   rootPath: string,
 ) => {
-  const base64 = ensureFixture(rootPath);
+  const buffer = await renderFixture(page, rootPath);
 
-  // ── Open the attachment menu on camera ────────────────────────────────────
+  // Hold the intercepted chooser until the drawn dialog has been used, so the
+  // file lands at the moment the cursor clicks Open rather than before it.
+  let resolveChooser: ((fc: FileChooser) => void) | undefined;
+  const chooserReady = new Promise<FileChooser>((resolve) => {
+    resolveChooser = resolve;
+  });
+  page.once('filechooser', (fc) => resolveChooser?.(fc));
+
+  // ── Open the composer's attachment menu ───────────────────────────────────
   const addBtn = page
-    .locator(
-      'button[aria-label*="Add photos or files" i], button[aria-label*="attach" i], .cdk-menu-trigger',
-    )
+    .locator('button[aria-label*="Add photos or files" i], .cdk-menu-trigger')
     .first();
-
   const addBox = await addBtn
     .waitFor({ state: 'visible', timeout: 8000 })
     .then(() => addBtn.boundingBox())
     .catch(() => null);
 
-  if (addBox) {
-    console.log(`   📎 Opening the attachment menu...`);
-    await humanGlide(page, addBox.x + addBox.width / 2, addBox.y + addBox.height / 2, 22);
-    await sleep(350);
-    await humanClick(page);
-    await sleep(600);
-  } else {
-    console.warn(`   ⚠️ attachment "+" control not found — attaching headlessly.`);
+  if (!addBox) {
+    throw new Error('Attachment control not found — the composer has no attachments menu.');
   }
 
-  const menuItem = page
-    .locator('[role="menuitem"]:has-text("Add photos or files"), .cdk-menu-item')
-    .first();
-  const menuBox = await menuItem
-    .isVisible({ timeout: 4000 })
-    .then((v) => (v ? menuItem.boundingBox() : null))
-    .catch(() => null);
+  console.log(`   📎 Opening the attachment menu...`);
+  await humanGlide(page, addBox.x + addBox.width / 2, addBox.y + addBox.height / 2, 22);
+  await sleep(350);
+  await humanClick(page);
+  await sleep(700);
 
-  if (menuBox) {
-    await humanGlide(page, menuBox.x + menuBox.width / 2, menuBox.y + menuBox.height / 2, 20);
-    await sleep(350);
-    await humanClick(page);
+  // The menu item carries a tooltip that sits on top of it and swallows real
+  // clicks, so this one is dispatched rather than aimed.
+  const menuItem = page.locator('[role="menuitem"], .cdk-menu-item').first();
+  const itemBox = await menuItem.boundingBox().catch(() => null);
+  if (itemBox) {
+    await humanGlide(page, itemBox.x + itemBox.width / 2, itemBox.y + itemBox.height / 2, 20);
+    await sleep(400);
+  }
+  await menuItem.click({ force: true });
+
+  // ── Pick the file, on camera ──────────────────────────────────────────────
+  await openFileDialog(page, [
+    { name: FIXTURE_NAME, kind: 'PNG image', size: `${Math.round(buffer.length / 1024)} KB` },
+    { name: 'team_offsite.jpg', kind: 'JPG image', size: '184 KB' },
+    { name: 'invoice_2026_08.pdf', kind: 'PDF document', size: '96 KB' },
+  ]);
+  await pickFileInDialog(page);
+  await closeFileDialog(page);
+
+  const chooser = await Promise.race([
+    chooserReady,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000)),
+  ]);
+
+  if (!chooser) {
+    throw new Error(
+      'No file chooser was raised — the attachment menu did not open a picker, ' +
+        'so nothing could be attached.',
+    );
   }
 
-  // ── Hand the file to the input the dialog would have filled ───────────────
-  console.log(`   📁 Placing ${FIXTURE_NAME} on the file input...`);
-  const attached = await page.evaluate(
-    async ({ b64, filename }) => {
-      const input = document.querySelector('input[type="file"]') as HTMLInputElement | null;
-      if (!input) return false;
-
-      const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-      const file = new File([bytes], filename, { type: 'image/png' });
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      input.files = dt.files;
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-      return true;
-    },
-    { b64: base64, filename: FIXTURE_NAME },
-  );
-
-  if (!attached) {
-    console.warn(`   ⚠️ no input[type=file] in the DOM — the queue will stay empty.`);
-  }
-  await sleep(1500);
+  await chooser.setFiles({ name: FIXTURE_NAME, mimeType: 'image/png', buffer });
+  console.log(`   📁 ${FIXTURE_NAME} attached (${buffer.length} bytes).`);
+  await sleep(1800);
 
   // ── Show the queued thumbnail before sending ──────────────────────────────
   const queue = page
@@ -109,7 +151,9 @@ export const runAttachmentsAction: PageActionHandler = async (
   if (queueBox) {
     console.log(`   🎯 Showing the queued attachment.`);
     await humanGlide(page, queueBox.x + queueBox.width / 2, queueBox.y + queueBox.height / 2, 22);
-    await sleep(1200);
+    await sleep(1400);
+  } else {
+    console.warn(`   ⚠️ nothing rendered in the attachment queue.`);
   }
 
   // The composer moves down once the queue appears, so the prompt is typed

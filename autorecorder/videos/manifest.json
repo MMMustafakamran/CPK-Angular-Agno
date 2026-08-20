@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-19T19:00:59.523Z",
+  "generatedAt": "2026-08-20T11:56:46.030Z",
   "framework": "Agno (Python) + Angular",
   "videoPrefix": "AGNO-angular",
   "clips": {
@@ -14,12 +14,11 @@
         "frontend/server.ts",
         "backend/main.py"
       ],
-      "sourceSha": "ccdd77c2edaf",
-      "recordedAt": "2026-08-19T18:10:44.591Z",
-      "bytes": 4886183,
-      "sha256": "413aa726361e",
-      "status": "drifted",
-      "because": "source hash a8139f1661cb -> ccdd77c2edaf since last manifest"
+      "sourceSha": "619ab050d787",
+      "recordedAt": "2026-08-20T11:56:25.156Z",
+      "bytes": 6652508,
+      "sha256": "370bcd6f7fc1",
+      "status": "new"
     },
     "chat-ui": {
       "order": 2,
@@ -34,7 +33,7 @@
       "recordedAt": "2026-08-19T18:12:32.823Z",
       "bytes": 7626096,
       "sha256": "991bdfaa5606",
-      "status": "new"
+      "status": "current"
     },
     "frontend-tools-generative-ui": {
       "order": 3,
@@ -49,7 +48,7 @@
       "recordedAt": "2026-08-19T18:14:15.831Z",
       "bytes": 6500985,
       "sha256": "b96afc225389",
-      "status": "new"
+      "status": "current"
     },
     "a2ui": {
       "order": 4,
@@ -64,7 +63,7 @@
       "recordedAt": "2026-08-19T18:16:33.628Z",
       "bytes": 8607896,
       "sha256": "f9183d31da69",
-      "status": "new"
+      "status": "current"
     },
     "voice-multimodal": {
       "order": 5,
@@ -75,10 +74,10 @@
         "frontend/src/app/features/media/voice-chat.component.ts"
       ],
       "sourceSha": "2bd750aa6f0a",
-      "recordedAt": "2026-08-19T18:20:38.349Z",
-      "bytes": 7252993,
-      "sha256": "4e83da4e5ff0",
-      "status": "new"
+      "recordedAt": "2026-08-20T11:41:24.865Z",
+      "bytes": 7832247,
+      "sha256": "600d1474d938",
+      "status": "current"
     },
     "human-in-the-loop": {
       "order": 6,
@@ -93,8 +92,7 @@
       "recordedAt": "2026-08-19T18:22:13.792Z",
       "bytes": 4279643,
       "sha256": "a45b6c4e2bfd",
-      "status": "drifted",
-      "because": "source hash 55570cbc9c53 -> 016761310c3c since last manifest"
+      "status": "current"
     },
     "shared-state": {
       "order": 7,
@@ -102,13 +100,14 @@
       "name": "Guides - Shared state and agent context",
       "file": "AGNO-angular-07-SharedState.webm",
       "sources": [
-        "frontend/src/app/features/shared-state/workspace.component.ts"
+        "frontend/src/app/features/shared-state/workspace.component.ts",
+        "frontend/src/app/features/shared-state/account-context.component.ts"
       ],
-      "sourceSha": "d6d7f0e66c28",
-      "recordedAt": "2026-08-19T18:23:17.040Z",
-      "bytes": 3579140,
-      "sha256": "a6bf5942c1e1",
-      "status": "new"
+      "sourceSha": "2140eb9af3da",
+      "recordedAt": "2026-08-20T11:50:30.899Z",
+      "bytes": 6380882,
+      "sha256": "84d6107f4454",
+      "status": "current"
     },
     "threads": {
       "order": 8,
@@ -123,7 +122,7 @@
       "recordedAt": "2026-08-19T18:25:02.849Z",
       "bytes": 5590879,
       "sha256": "6a78b70458a8",
-      "status": "new"
+      "status": "current"
     },
     "memory": {
       "order": 9,
@@ -137,7 +136,7 @@
       "recordedAt": "2026-08-19T18:26:05.474Z",
       "bytes": 4055010,
       "sha256": "5c9c2bbcd022",
-      "status": "new"
+      "status": "current"
     },
     "attachments": {
       "order": 10,
@@ -147,11 +146,11 @@
       "sources": [
         "frontend/src/app/features/attachments/media-chat.component.ts"
       ],
-      "sourceSha": "207f32e0e9c2",
-      "recordedAt": "2026-08-19T18:27:02.083Z",
-      "bytes": 3314446,
-      "sha256": "6e705f78d216",
-      "status": "new"
+      "sourceSha": "ae00ca06086c",
+      "recordedAt": "2026-08-20T11:37:32.183Z",
+      "bytes": 4766587,
+      "sha256": "4bcfa35eec7f",
+      "status": "current"
     },
     "headless": {
       "order": 11,
@@ -165,7 +164,7 @@
       "recordedAt": "2026-08-19T18:27:58.226Z",
       "bytes": 3737118,
       "sha256": "21bc98a22b26",
-      "status": "new"
+      "status": "current"
     }
   }
 }

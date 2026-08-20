@@ -3,9 +3,16 @@
  *
  * https://docs.copilotkit.ai/angular/agno/guides/shared-state
  *
- * Clicking "Mark high priority" before prompting is what makes the answer
- * evidence: the agent can only say "high" if the write reached it, so the video
- * shows the round trip rather than a plausible sentence.
+ * Two browser-side writes happen before the prompt, and both are what make the
+ * answer evidence rather than a plausible sentence:
+ *
+ * - "Mark high priority" writes agent *state*, so "high" can only come back if
+ *   the write reached the agent.
+ * - "Use London time" changes a signal the read-only *context* accessor reads,
+ *   so "Europe/London" can only come back if the context re-registered.
+ *
+ * The prompt deliberately does not ask about `notes`: that array is always empty
+ * in this demo, so it gave the agent nothing to be right or wrong about.
  */
 import { type Page } from 'playwright';
 
@@ -32,11 +39,26 @@ export const runSharedStateAction: PageActionHandler = async (
     console.warn(`   ⚠️ "Mark high priority" not found — the agent will read the default state.`);
   }
 
+  // Second write: a signal the context accessor reads, so the re-registration
+  // is observable in the same answer.
+  const timezoneBtn = page
+    .locator('app-account-context button:has-text("Use London time")')
+    .first();
+  const tzBox = await timezoneBtn.boundingBox().catch(() => null);
+  if (tzBox) {
+    console.log(`   🌍 Switching the account timezone to Europe/London...`);
+    await humanGlide(page, tzBox.x + tzBox.width / 2, tzBox.y + tzBox.height / 2, 20);
+    await sleep(400);
+    await humanClick(page);
+    await sleep(1000);
+  } else {
+    console.warn(`   ⚠️ "Use London time" not found — the agent will read the default timezone.`);
+  }
+
   const msgCount = await sendPrompt(page, config.prompt);
   await waitForAgentResponseCompletion(page, config.waitAfterPromptMs ?? 4000, msgCount);
 
-  // The two read-only context components are the guide's other half — nothing
-  // to click, so the cursor just rests on them.
+  // Rest on the context panel the answer just quoted back.
   const accountContext = page.locator('app-account-context').first();
   const ctxBox = await accountContext.boundingBox().catch(() => null);
   if (ctxBox) {

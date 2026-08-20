@@ -177,7 +177,20 @@ export const PAGES = definePages([
     ideFile: 'frontend/src/app/features/shared-state/workspace.component.ts',
     startLine: 19,
     endLine: 48,
-    prompt: 'What is my current priority and what notes do I have?',
+    extraTabs: [
+      {
+        filePath:
+          'frontend/src/app/features/shared-state/account-context.component.ts',
+        startLine: 9,
+        endLine: 31,
+      },
+    ],
+    // Both halves of the guide in one question: `priority` is agent *state*,
+    // written from the browser; `userName`/`timezone` are read-only *context*.
+    // The earlier "what notes do I have?" was unanswerable -- the notes array is
+    // always empty here, so the agent had nothing to be right about.
+    prompt:
+      'What is my username and timezone, and what priority is my workspace set to?',
     waitAfterPromptMs: 4000,
   },
   {
@@ -225,7 +238,12 @@ export const PAGES = definePages([
     ideFile: 'frontend/src/app/features/attachments/media-chat.component.ts',
     startLine: 9,
     endLine: 23,
-    prompt: 'What types of attachments are supported?',
+    // Asks for two values that exist only inside the attached image, so a
+    // correct answer is proof the file reached the model. The old
+    // "what types of attachments are supported?" could be answered from the
+    // system prompt alone, which is why a broken upload looked fine on video.
+    prompt:
+      'Read the attached chart. What is its title, and what is the Q4 value?',
     waitAfterPromptMs: 4000,
   },
   {

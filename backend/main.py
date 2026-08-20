@@ -59,5 +59,8 @@ agent_os = AgentOS(
 app = agent_os.get_app()
 
 if __name__ == "__main__":
-    agent_os.serve(app="main:app", port=8000, reload=True)
+    # Port is env-driven so this can move off 8000 when something else on the
+    # machine already has it. Default unchanged, so nothing else needs updating
+    # for a standard run.
+    agent_os.serve(app="main:app", port=int(os.getenv("AGNO_PORT", "8000")), reload=True)
 

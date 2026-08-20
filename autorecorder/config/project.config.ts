@@ -90,7 +90,11 @@ export const PROJECT: ProjectConfig = {
 
   docBaseUrl: 'https://docs.copilotkit.ai/angular/agno',
 
-  // `ng serve`, not Next.
+  // `ng serve`, not Next. Both are env-overridable, which is how a run moves off
+  // a port another project is already holding:
+  //   AGNO_PORT=8100 uv run main.py                       (backend/main.py)
+  //   AGNO_AGENT_URL=http://localhost:8100/agui npm run dev   (frontend)
+  //   BACKEND_URL=http://localhost:8100 npm run record        (here)
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:4200',
   backendUrl: process.env.BACKEND_URL || 'http://localhost:8000',
   // Agno's AgentOS exposes /status, not /health. The doc's suggested
