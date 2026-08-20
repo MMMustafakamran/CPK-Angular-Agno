@@ -107,6 +107,26 @@ Then edit `backend/.env`:
 
 > The Angular app's `runtimeUrl` is hardcoded to `http://localhost:8200/api/copilotkit` in `frontend/src/app/app.config.ts`, following the quickstart. If you change `PORT`, change that too.
 
+**5. Update to latest packages (optional)**
+
+To upgrade all packages across frontend and backend to their latest versions:
+
+**Frontend:**
+```bash
+cd frontend
+npx npm-check-updates -u
+npm install
+cd ..
+```
+
+**Backend:**
+```bash
+cd backend
+uv lock --upgrade
+uv sync
+cd ..
+```
+
 **Default ports:** frontend **4200**, runtime **8200**, agent **8000**.
 
 ---
