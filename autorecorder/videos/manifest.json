@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-20T11:56:46.030Z",
+  "generatedAt": "2026-08-24T16:39:56.826Z",
   "framework": "Agno (Python) + Angular",
   "videoPrefix": "AGNO-angular",
   "clips": {
@@ -14,11 +14,11 @@
         "frontend/server.ts",
         "backend/main.py"
       ],
-      "sourceSha": "619ab050d787",
-      "recordedAt": "2026-08-20T11:56:25.156Z",
-      "bytes": 6652508,
-      "sha256": "370bcd6f7fc1",
-      "status": "new"
+      "sourceSha": "a587d70ccdf4",
+      "recordedAt": "2026-08-24T16:39:35.971Z",
+      "bytes": 4969392,
+      "sha256": "ac5ebc273718",
+      "status": "current"
     },
     "chat-ui": {
       "order": 2,
@@ -30,9 +30,9 @@
         "frontend/src/app/features/chat-ui/custom-assistant-message.component.ts"
       ],
       "sourceSha": "d6639fe60522",
-      "recordedAt": "2026-08-19T18:12:32.823Z",
-      "bytes": 7626096,
-      "sha256": "991bdfaa5606",
+      "recordedAt": "2026-08-24T16:25:50.780Z",
+      "bytes": 7002808,
+      "sha256": "5f18f9e7e7f3",
       "status": "current"
     },
     "frontend-tools-generative-ui": {
@@ -45,9 +45,9 @@
         "frontend/src/app/features/tools/weather-card.component.ts"
       ],
       "sourceSha": "830a2c98b26d",
-      "recordedAt": "2026-08-19T18:14:15.831Z",
-      "bytes": 6500985,
-      "sha256": "b96afc225389",
+      "recordedAt": "2026-08-24T16:27:13.830Z",
+      "bytes": 5715519,
+      "sha256": "4c5fb2f2fe7b",
       "status": "current"
     },
     "a2ui": {
@@ -60,9 +60,9 @@
         "frontend/server.ts"
       ],
       "sourceSha": "e2d994ef90f2",
-      "recordedAt": "2026-08-19T18:16:33.628Z",
-      "bytes": 8607896,
-      "sha256": "f9183d31da69",
+      "recordedAt": "2026-08-24T16:29:08.176Z",
+      "bytes": 6615433,
+      "sha256": "f3159b3d98f0",
       "status": "current"
     },
     "voice-multimodal": {
@@ -74,9 +74,9 @@
         "frontend/src/app/features/media/voice-chat.component.ts"
       ],
       "sourceSha": "2bd750aa6f0a",
-      "recordedAt": "2026-08-20T11:41:24.865Z",
-      "bytes": 7832247,
-      "sha256": "600d1474d938",
+      "recordedAt": "2026-08-24T16:30:53.121Z",
+      "bytes": 5446916,
+      "sha256": "a31ddea5eb7e",
       "status": "current"
     },
     "human-in-the-loop": {
@@ -89,9 +89,9 @@
         "frontend/src/app/features/hitl/approval-card.component.ts"
       ],
       "sourceSha": "016761310c3c",
-      "recordedAt": "2026-08-19T18:22:13.792Z",
-      "bytes": 4279643,
-      "sha256": "a45b6c4e2bfd",
+      "recordedAt": "2026-08-24T16:31:57.706Z",
+      "bytes": 3997654,
+      "sha256": "9cce93c0af61",
       "status": "current"
     },
     "shared-state": {
@@ -104,9 +104,9 @@
         "frontend/src/app/features/shared-state/account-context.component.ts"
       ],
       "sourceSha": "2140eb9af3da",
-      "recordedAt": "2026-08-20T11:50:30.899Z",
-      "bytes": 6380882,
-      "sha256": "84d6107f4454",
+      "recordedAt": "2026-08-24T16:32:58.739Z",
+      "bytes": 4247272,
+      "sha256": "f613e47ce997",
       "status": "current"
     },
     "threads": {
@@ -119,9 +119,9 @@
         "frontend/src/app/features/threads/threads-demo.component.ts"
       ],
       "sourceSha": "df38cc95b7cc",
-      "recordedAt": "2026-08-19T18:25:02.849Z",
-      "bytes": 5590879,
-      "sha256": "6a78b70458a8",
+      "recordedAt": "2026-08-24T16:34:55.287Z",
+      "bytes": 6182569,
+      "sha256": "1e1222c2f0e7",
       "status": "current"
     },
     "memory": {
@@ -133,9 +133,9 @@
         "frontend/src/app/features/memory/memory-list.component.ts"
       ],
       "sourceSha": "2cb800afef67",
-      "recordedAt": "2026-08-19T18:26:05.474Z",
-      "bytes": 4055010,
-      "sha256": "5c9c2bbcd022",
+      "recordedAt": "2026-08-24T16:36:08.304Z",
+      "bytes": 5624805,
+      "sha256": "fe72573e4405",
       "status": "current"
     },
     "attachments": {
@@ -147,9 +147,9 @@
         "frontend/src/app/features/attachments/media-chat.component.ts"
       ],
       "sourceSha": "ae00ca06086c",
-      "recordedAt": "2026-08-20T11:37:32.183Z",
-      "bytes": 4766587,
-      "sha256": "4bcfa35eec7f",
+      "recordedAt": "2026-08-24T16:37:15.372Z",
+      "bytes": 3979603,
+      "sha256": "f5d2a6ada558",
       "status": "current"
     },
     "headless": {
@@ -161,9 +161,9 @@
         "frontend/src/app/features/headless/headless-chat.component.ts"
       ],
       "sourceSha": "85b0ff48591e",
-      "recordedAt": "2026-08-19T18:27:58.226Z",
-      "bytes": 3737118,
-      "sha256": "21bc98a22b26",
+      "recordedAt": "2026-08-24T16:38:08.109Z",
+      "bytes": 3253747,
+      "sha256": "05a4d6e13c2c",
       "status": "current"
     }
   }

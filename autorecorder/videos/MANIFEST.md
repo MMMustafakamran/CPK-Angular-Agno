@@ -6,21 +6,21 @@ The `.webm` files are **not** in git; this file is how their state is tracked.
 Regenerate it after every `npm run record`, and commit it — the diff is the
 record of what that run changed.
 
-Generated **2026-08-20 11:56** · 1 new · 10 current
+Generated **2026-08-24 16:39** · 11 current
 
 | # | Clip | Recorded | Size | Status | Note |
 |---|------|----------|------|--------|------|
-| 01 | `AGNO-angular-01-Quickstart.webm` | 2026-08-20 11:56 | 6.3 MB | 🆕 new |  |
-| 02 | `AGNO-angular-02-ChatUi.webm` | 2026-08-19 18:12 | 7.3 MB | ✅ current |  |
-| 03 | `AGNO-angular-03-FrontendToolsGenerativeUi.webm` | 2026-08-19 18:14 | 6.2 MB | ✅ current |  |
-| 04 | `AGNO-angular-04-A2ui.webm` | 2026-08-19 18:16 | 8.2 MB | ✅ current |  |
-| 05 | `AGNO-angular-05-VoiceMultimodal.webm` | 2026-08-20 11:41 | 7.5 MB | ✅ current |  |
-| 06 | `AGNO-angular-06-HumanInTheLoop.webm` | 2026-08-19 18:22 | 4.1 MB | ✅ current |  |
-| 07 | `AGNO-angular-07-SharedState.webm` | 2026-08-20 11:50 | 6.1 MB | ✅ current |  |
-| 08 | `AGNO-angular-08-Threads.webm` | 2026-08-19 18:25 | 5.3 MB | ✅ current |  |
-| 09 | `AGNO-angular-09-Memory.webm` | 2026-08-19 18:26 | 3.9 MB | ✅ current |  |
-| 10 | `AGNO-angular-10-Attachments.webm` | 2026-08-20 11:37 | 4.5 MB | ✅ current |  |
-| 11 | `AGNO-angular-11-HeadlessUi.webm` | 2026-08-19 18:27 | 3.6 MB | ✅ current |  |
+| 01 | `AGNO-angular-01-Quickstart.webm` | 2026-08-24 16:39 | 4.7 MB | ✅ current |  |
+| 02 | `AGNO-angular-02-ChatUi.webm` | 2026-08-24 16:25 | 6.7 MB | ✅ current |  |
+| 03 | `AGNO-angular-03-FrontendToolsGenerativeUi.webm` | 2026-08-24 16:27 | 5.5 MB | ✅ current |  |
+| 04 | `AGNO-angular-04-A2ui.webm` | 2026-08-24 16:29 | 6.3 MB | ✅ current |  |
+| 05 | `AGNO-angular-05-VoiceMultimodal.webm` | 2026-08-24 16:30 | 5.2 MB | ✅ current |  |
+| 06 | `AGNO-angular-06-HumanInTheLoop.webm` | 2026-08-24 16:31 | 3.8 MB | ✅ current |  |
+| 07 | `AGNO-angular-07-SharedState.webm` | 2026-08-24 16:32 | 4.1 MB | ✅ current |  |
+| 08 | `AGNO-angular-08-Threads.webm` | 2026-08-24 16:34 | 5.9 MB | ✅ current |  |
+| 09 | `AGNO-angular-09-Memory.webm` | 2026-08-24 16:36 | 5.4 MB | ✅ current |  |
+| 10 | `AGNO-angular-10-Attachments.webm` | 2026-08-24 16:37 | 3.8 MB | ✅ current |  |
+| 11 | `AGNO-angular-11-HeadlessUi.webm` | 2026-08-24 16:38 | 3.1 MB | ✅ current |  |
 
 **Status meanings**
 
