@@ -1,0 +1,56 @@
+# Open-source Telemetry
+
+
+CopilotKit uses metadata-only product telemetry to learn how to improve the
+open-source packages.
+
+- We do not collect prompts, messages, agent state, tool data, or other application content.
+- We do not sell or share telemetry data with third parties.
+- We do not use cookies or trackers for open-source telemetry.
+
+Runtime events may carry the telemetry ID from a configured Intelligence or
+license token. Runtime events without that ID are sampled. Inspector events use
+a persistent anonymous Inspector ID stored in your browser.
+
+## Inspector metadata events
+
+The Inspector sends coarse events when trusted project-context modules become
+visible and when a user follows a plan action:
+
+| Event | Feature-specific properties |
+| --- | --- |
+| `oss.inspector.metadata_module_viewed` | `module`, `license_bucket`, and `action_kind` when the visible module is an action |
+| `oss.inspector.metadata_action_clicked` | `module: "action"`, `action_kind`, and `license_bucket` for **Manage plan** and **Renew** clicks |
+
+`module` is `identity`, `plan`, or `action`. `action_kind` is `manage_plan`,
+`renew`, or `enable_intelligence`. `license_bucket` is `valid`, `none`,
+`expired`, or `unknown`.
+
+An **Enable Intelligence** click keeps the existing
+`oss.inspector.threads_intelligence_signup_clicked` event so existing reports
+stay continuous. The same click does not also send
+`oss.inspector.metadata_action_clicked`.
+
+The feature-specific payload never includes organization, project, account, or
+user names; account, organization, project, user, thread, run, or message IDs;
+action or runtime URLs; usage values, limits, or counts; or conversation and
+tool content. Metadata usage impressions are not sent. The standard anonymous
+telemetry envelope includes package identity, anonymous distinct IDs, and an
+event timestamp.
+
+## How to opt out of open-source telemetry
+
+Set `COPILOTKIT_TELEMETRY_DISABLED=true` in your runtime environment. This
+disables telemetry for both the CopilotRuntime and Inspector. We also respect
+[Do Not Track (DNT)](https://consoledonottrack.com/).
+
+## How to adjust the telemetry sample rate
+
+The default sample rate for Runtime events without a telemetry ID is `0.05`
+(5%). Runtime callers with a telemetry ID bypass sampling. Set
+`COPILOTKIT_TELEMETRY_SAMPLE_RATE` to a value from 0 through 1 to change the
+anonymous Runtime sample rate.
+
+## Get in touch
+
+Send telemetry questions to [hello@copilotkit.ai](mailto:hello@copilotkit.ai).

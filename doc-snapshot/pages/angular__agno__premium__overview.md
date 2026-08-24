@@ -1,0 +1,75 @@
+# Enterprise Intelligence Platform
+
+> Enterprise Intelligence Platform overview for CopilotKit — features, cloud-hosted and self-hosted deployment options, threads, hosted inspection, and production operations.
+
+
+
+## What is the Enterprise Intelligence Platform?
+
+The Enterprise Intelligence Platform is CopilotKit's production layer for durable threads, persistence, hosted inspection, and operational visibility. It sits beside your CopilotKit runtime and gives production agentic applications shared infrastructure without changing the frontend SDK, AG-UI protocol, or agent framework you use.
+
+Start here when you are deciding what the platform gives you and where it should run. The rest of the Intelligence Platform docs are deeper dives into the specific feature or hosting path you choose.
+
+<Callout type="info" title="See this in Inspector">
+  Open Inspector on localhost. Go to **Learning**.
+  Memory and learning tools for this session appear here.
+
+  More detail: [Inspector](/angular/agno/inspector).
+</Callout>
+
+
+## What the platform adds
+
+| Capability | What it gives you | Deeper dive |
+|---|---|---|
+| Durable threads and persistence | Resumable conversations that survive reloads, devices, and browser sessions. | [Threads](/angular/agno/guides/threads-memory-attachments-headless) and [Threads & Persistence Architecture](/angular/agno/premium/threads-explained) |
+| Cloud-hosted Intelligence features | Projects, project API keys, conversation history, thread inspection, and plan management. | [Cloud-Hosted Enterprise Intelligence](/angular/agno/premium/managed-intelligence-platform) |
+| Premium UI capabilities | Platform-gated UI surfaces such as Fully Headless Chat UI. | [Fully Headless Chat UI](/angular/agno/guides/threads-memory-attachments-headless) |
+| Self-hosting | The same platform running inside your own Kubernetes cluster, VPC, or data boundary. | [Self-Hosting Enterprise Intelligence](/angular/agno/premium/self-hosting) |
+
+## Hosting options
+
+| Option | Choose it when | What you operate |
+|---|---|---|
+| [Cloud-Hosted Enterprise Intelligence](/angular/agno/premium/managed-intelligence-platform) | You want CopilotKit to run the platform for you: hosted projects, API keys, thread history, dashboard inspection, and plan management. | Your app, your runtime, your agent, and your model provider credentials. |
+| [Self-Hosting Enterprise Intelligence](/angular/agno/premium/self-hosting) | You need the platform inside your own VPC, Kubernetes cluster, data residency boundary, or enterprise operations model. | The `copilot-intelligence` Helm release, Postgres, Redis, ingress, OIDC, secrets, upgrades, and monitoring. |
+
+Both options use the same CopilotKit application surface. Your frontend still uses CopilotKit APIs, your runtime still speaks AG-UI, and your agents keep the same framework integration. The deployment choice changes the platform endpoint and credentials your runtime uses.
+
+## Plans and access
+
+The cloud-hosted version includes self-service plans for individual developers and teams, plus enterprise options for larger deployments. You manage cloud-hosted plans in the web app.
+
+Self-hosted access is available on the Team self-hosted plan or a custom Enterprise plan. Use it when you have a concrete compliance, residency, network, or platform-operations requirement that makes a hosted service the wrong fit.
+
+<OpsPlatformCTA
+  variant="inline"
+  title="Create a free Enterprise Intelligence Platform account"
+  body="Start with the cloud-hosted Developer tier, create a project, and inspect persistent threads from the web app."
+  surface="docs_premium_overview"
+/>
+
+## Which page should I read next?
+
+| Goal | Read this |
+|---|---|
+| Decide what the platform includes | Stay on this overview. |
+| Connect an app to hosted projects and API keys | [Cloud-Hosted Enterprise Intelligence](/angular/agno/premium/managed-intelligence-platform) |
+| Run the platform in your own cluster | [Self-Hosting Enterprise Intelligence](/angular/agno/premium/self-hosting) |
+| Understand the runtime/platform architecture | [Enterprise Intelligence Architecture](/angular/agno/premium/intelligence-platform) |
+| Add persistent conversations to an app | [Threads](/angular/agno/guides/threads-memory-attachments-headless) |
+| Understand thread replay and realtime sync | [Threads & Persistence Architecture](/angular/agno/premium/threads-explained) |
+
+## FAQs
+
+### Does my application code change between hosting options?
+
+No. Your frontend UI, CopilotKit runtime, and agent integration stay focused on CopilotKit APIs. The deployment mode changes which platform URL and credentials your runtime uses.
+
+### What is the difference between a project API key and a license key?
+
+A project API key connects your runtime to one cloud-hosted Enterprise Intelligence project. A license key unlocks self-hosted Enterprise Intelligence capabilities and does not require runtime traffic to go through the cloud-hosted service.
+
+### Can I start cloud-hosted and move to self-hosted later?
+
+Yes. The application integration is intentionally the same. Moving from cloud-hosted projects to self-hosting is available on the Team self-hosted plan or a custom Enterprise plan. Plan the migration around data movement, identity, network endpoints, and operational ownership rather than a frontend rewrite.
