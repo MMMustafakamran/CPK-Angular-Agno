@@ -109,12 +109,12 @@ Then edit `backend/.env`:
 
 **5. Update to latest packages (optional)**
 
-To upgrade all packages across frontend and backend to their latest versions:
+To upgrade packages across frontend and backend while respecting peer dependency constraints:
 
 **Frontend:**
 ```bash
 cd frontend
-npx npm-check-updates -u
+npx npm-check-updates -u --peer
 npm install
 cd ..
 ```
