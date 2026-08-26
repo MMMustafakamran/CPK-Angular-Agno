@@ -293,6 +293,21 @@ browser and drive the live feature.
    tool cards, approval clicks, attachment uploads, tab switches, and a Windows 11
    Notepad window for pages whose finding is a limitation rather than a feature.
 
+### One command, from a cold repo
+
+[`ci/`](ci/README.md) drives the whole thing — doc-drift check, preflight,
+dependency install, all three servers, recording, mux and report — from a single
+Node process, and is what the nightly GitHub Actions workflow runs:
+
+```bash
+npm run automate                              # everything, all pages
+npm run automate -- --pages=quickstart,threads
+npm run automate -- --limit=3 --ignore-doc-drift
+```
+
+It starts the servers itself, so the section below applies only when you would
+rather drive the recorder by hand against servers you started yourself.
+
 ### How to run
 
 The backend (`:8000`), the Copilot Runtime (`:8200`) and the Angular dev server

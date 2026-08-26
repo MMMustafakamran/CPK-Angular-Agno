@@ -21,10 +21,12 @@ backend/__pycache__/
 backend/agno.db
 *.db
 
-# Recordings & Autorecord
-autorecord/node_modules/
-autorecord/videos/*.webm
-autorecord/videos/.temp_chunks/
+# Recordings & Autorecorder
+autorecorder/node_modules/
+autorecorder/videos/*.webm
+autorecorder/videos/RUN_REPORT.*
+autorecorder/videos/logs/
+autorecorder/videos/.temp_chunks/
 
 # OS
 .DS_Store
