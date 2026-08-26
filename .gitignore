@@ -28,3 +28,8 @@ autorecord/videos/.temp_chunks/
 
 # OS
 .DS_Store
+
+# Drift reports are derived data — regenerated on every /doc-sync run.
+# The snapshot itself (doc-snapshot/pages/, manifest.json, CHANGELOG.md)
+# IS committed; it is the baseline every diff is taken against.
+doc-snapshot/reports/
