@@ -114,10 +114,10 @@ To upgrade packages across frontend and backend while respecting peer dependency
 **Frontend:**
 ```bash
 cd frontend
-npx npm-check-updates -u --peer
-npm install
+npm run deps:update
 cd ..
 ```
+*(Or directly: `npx npm-check-updates -u --peer && npm install`)*
 
 **Backend:**
 ```bash
