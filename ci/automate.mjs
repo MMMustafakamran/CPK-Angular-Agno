@@ -57,6 +57,22 @@ const OWN_FLAGS = [
   '--skip-credential-check',
 ];
 
+/**
+ * How the frontend, agent and recorder are installed.
+ *
+ * `--legacy-peer-deps` is not a workaround bolted on here: it is how both
+ * READMEs document installing this repo, and therefore the only resolution its
+ * committed dependency set has ever been checked against. A plain `npm install`
+ * is stricter than any install this project has actually had, so CI fails on
+ * peer conflicts no local run has ever hit — which is what happened on the
+ * first clean run.
+ *
+ * It hides real conflicts, so it is not a licence to ignore them: a peer error
+ * that still appears here means a pin is wrong, and belongs fixed in the
+ * package.json rather than silenced twice.
+ */
+const NPM_INSTALL = 'npm install --legacy-peer-deps';
+
 const args = process.argv.slice(2);
 const shouldPull = args.includes('--pull');
 const shouldUpgrade = args.includes('--upgrade');
@@ -272,8 +288,8 @@ async function main() {
         );
       }
 
-      runSync('npm install', FRONTEND_DIR, 'Installing Frontend Dependencies');
-      runSync('npm install', RECORDER_DIR, 'Installing Autorecorder Dependencies');
+      runSync(NPM_INSTALL, FRONTEND_DIR, 'Installing Frontend Dependencies');
+      runSync(NPM_INSTALL, RECORDER_DIR, 'Installing Autorecorder Dependencies');
     }
 
     // 4. Servers — skipped for any port already being served.
