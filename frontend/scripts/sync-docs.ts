@@ -241,7 +241,7 @@ async function run() {
       localContent = fs.readFileSync(filePath, 'utf8');
     }
 
-    const hasChanged = localContent !== '' && liveSha256 !== prevSha256 && localContent !== liveContent;
+    const hasChanged = localContent !== '' && localContent !== liveContent;
 
     manifestPages[pageDef.docPath] = {
       file: filename,
@@ -269,7 +269,7 @@ async function run() {
         hunks: [],
       });
       // Ensure file exists
-      if (!fs.existsSync(filePath)) {
+      if (!fs.existsSync(filePath) && !isCheckOnly) {
         fs.writeFileSync(filePath, liveContent, 'utf8');
       }
     } else {
@@ -343,7 +343,7 @@ async function run() {
     },
   };
 
-  if (!isCheckOnly || changedPages.length > 0) {
+  if (!isCheckOnly) {
     fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
 
     const report = {
@@ -370,8 +370,8 @@ async function run() {
     }
   }
 
-  // Update CHANGELOG if changes detected
-  if (changedPages.length > 0) {
+  // Update CHANGELOG if changes detected and not check-only
+  if (changedPages.length > 0 && !isCheckOnly) {
     const changelogDateStr = now.toISOString().split('T')[0];
     const timeStr = `${String(now.getUTCHours()).padStart(2, '0')}:${String(now.getUTCMinutes()).padStart(2, '0')} UTC`;
     const highestSeverity = changedPages.some((p) => p.severity === 'high')

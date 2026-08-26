@@ -1,12 +1,12 @@
 # CopilotKit CLI
 
-> Use the CopilotKit CLI to create apps, sign in to Cloud-Hosted Enterprise Intelligence, select projects, provision runtime API keys, import historical conversations, and install agent skills.
+> Use the CopilotKit CLI to create apps, sign in to cloud-hosted CopilotKit Intelligence, select projects, provision runtime API keys, import historical conversations, and install agent skills.
 
 
 
 ## What is this?
 
-The CopilotKit CLI helps you create CopilotKit apps connected to Enterprise Intelligence, whether cloud-hosted or self-hosted. It handles browser sign-in, project selection, project-scoped runtime API keys, historical thread import, and local project configuration so your app can use durable threads and conversation history.
+The CopilotKit CLI helps you create CopilotKit apps connected to CopilotKit Intelligence, whether cloud-hosted or self-hosted. It handles browser sign-in, project selection, project-scoped runtime API keys, historical thread import, and local project configuration so your app can use durable threads and conversation history.
 
 Use the CLI when you want to start a new app, import historical ADK or LangGraph conversations, or install CopilotKit agent skills for your coding agent.
 
@@ -22,7 +22,7 @@ Use the CLI when you want to start a new app, import historical ADK or LangGraph
 ## Prerequisites
 
 - Node.js 20+
-- A CopilotKit account for Cloud-Hosted Enterprise Intelligence
+- A CopilotKit account for cloud-hosted CopilotKit Intelligence
 - An OpenAI API key or another model provider key for the starter app you choose
 
 <Callout type="info" title="Team Self-hosted is a plan, not a deployment login">
@@ -43,7 +43,7 @@ Use the CLI when you want to start a new app, import historical ADK or LangGraph
     npx copilotkit@latest create
     ```
 
-    The CLI prompts for the app name and framework, opens browser sign-in when needed, scaffolds the starter, and connects the app to a cloud-hosted Enterprise Intelligence project.
+    The CLI prompts for the app name and framework, opens browser sign-in when needed, scaffolds the starter, and connects the app to a cloud-hosted CopilotKit Intelligence project.
   </Step>
 
   <Step>
@@ -109,7 +109,7 @@ Use the CLI when you want to start a new app, import historical ADK or LangGraph
 
 ## Import and synchronize historical conversations
 
-Use `import` from a CopilotKit app created with the CLI and Enterprise Intelligence enabled. The importer targets the Enterprise Intelligence project already selected for the current directory.
+Use `import` from a CopilotKit app created with the CLI and CopilotKit Intelligence enabled. The importer targets the CopilotKit Intelligence project already selected for the current directory.
 
 <Tabs groupId="cli-import-source" items={["ADK", "LangGraph"]}>
   <Tab value="ADK">
@@ -163,7 +163,7 @@ For the full adoption flow, see [Import & Synchronize Thread History](/angular/a
 
 | Command | What it does |
 |---|---|
-| `npx copilotkit@latest project select` | Selects or creates a cloud-hosted Enterprise Intelligence project for the current directory. |
+| `npx copilotkit@latest project select` | Selects or creates a cloud-hosted CopilotKit Intelligence project for the current directory. |
 | `npx copilotkit@latest import --source adk --dry-run` | Previews historical Google ADK conversation threads before import. |
 | `npx copilotkit@latest import --source langgraph --dry-run` | Previews historical LangGraph conversation threads before import. |
 | `npx copilotkit@latest license create` | Issues a CopilotKit license token for flows that require one. |
@@ -180,7 +180,7 @@ Re-running `project select` is safe when you need to move a CLI-created app to a
 
 ## Next steps
 
-- **Cloud-hosted platform:** [Cloud-Hosted Enterprise Intelligence](/angular/agno/premium/managed-intelligence-platform) — login, projects, API keys, threads, and plans in the hosted web app
+- **Cloud-hosted platform:** [Cloud-hosted CopilotKit Intelligence](/angular/agno/premium/managed-intelligence-platform) — login, projects, API keys, threads, and plans in the hosted web app
 - **Add threads:** use the [Threads Drawer](/angular/agno/guides/threads-memory-attachments-headless) for a drop-in thread switcher, or [Headless Threads](/angular/agno/guides/threads-memory-attachments-headless) to build your own thread UI
 - **Synchronize thread history:** [Import & Synchronize Thread History](/angular/agno/guides/threads-memory-attachments-headless) — import existing ADK or LangGraph conversations and keep future CopilotKit runs synchronized
-- **Self-hosting:** [Self-Hosting Enterprise Intelligence](/angular/agno/premium/self-hosting) — run the Enterprise Intelligence Platform in your own Kubernetes cluster
+- **Self-hosting:** [Self-host CopilotKit Intelligence](/angular/agno/premium/self-hosting) — run CopilotKit Intelligence in your own Kubernetes cluster

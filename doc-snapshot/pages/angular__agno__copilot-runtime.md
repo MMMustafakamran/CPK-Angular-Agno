@@ -90,9 +90,9 @@ The [AG-UI protocol](/angular/agno/agentic-protocols/ag-ui) supports a middlewar
 
 When you register multiple agents with the runtime, it handles discovery and routing automatically. Your frontend doesn't need to know the details of where each agent lives or how to reach it.
 
-### Enterprise Intelligence Platform
+### CopilotKit Intelligence
 
-Features like [threads](/angular/agno/guides/threads-memory-attachments-headless) and the [inspector](/angular/agno/inspector) are provided through the runtime and the Enterprise Intelligence Platform. These give you conversation persistence and debugging capabilities out of the box.
+Features like [threads](/angular/agno/guides/threads-memory-attachments-headless) and the [inspector](/angular/agno/inspector) are provided through the runtime and CopilotKit Intelligence. These give you conversation persistence and debugging capabilities out of the box.
 
 ## Built-in Middleware
 

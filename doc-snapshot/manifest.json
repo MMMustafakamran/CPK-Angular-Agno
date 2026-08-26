@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "docsRoot": "https://docs.copilotkit.ai/angular/agno",
-  "syncedAt": "2026-08-24T16:05:32.326Z",
+  "syncedAt": "2026-08-26T19:44:26.487Z",
   "pages": {
     "/angular/agno": {
       "file": "angular__agno.md",
-      "sha256": "ecdca90cd938f39453f2bbbff2c5e5ac201de5eb757e7ddcf521288973b9764e",
+      "sha256": "90d8e87da25422da69b19148cf26a20f23dc302adfe04caa283b7e2698f61a94",
       "bytes": 7215,
       "lines": 185,
       "routes": [
@@ -13,11 +13,11 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/quickstart": {
       "file": "angular__agno__quickstart.md",
-      "sha256": "ecdca90cd938f39453f2bbbff2c5e5ac201de5eb757e7ddcf521288973b9764e",
+      "sha256": "90d8e87da25422da69b19148cf26a20f23dc302adfe04caa283b7e2698f61a94",
       "bytes": 7215,
       "lines": 185,
       "routes": [
@@ -25,17 +25,17 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/using-these-docs": {
       "file": "angular__agno__using-these-docs.md",
-      "sha256": "b5176129c70cd6dacec67190c72585cd2f54c48717922575973f907c38a00088",
+      "sha256": "419eb01d11d9cd9b07ce8f3ddf915069b7aa6e76405515937153dc50e4f0d8e4",
       "bytes": 2110,
       "lines": 21,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/features": {
       "file": "angular__agno__features.md",
@@ -45,7 +45,7 @@
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/guides/chat-ui": {
       "file": "angular__agno__guides__chat-ui.md",
@@ -57,7 +57,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/guides/frontend-tools-generative-ui": {
       "file": "angular__agno__guides__frontend-tools-generative-ui.md",
@@ -69,7 +69,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/guides/a2ui": {
       "file": "angular__agno__guides__a2ui.md",
@@ -81,7 +81,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/guides/voice-multimodal": {
       "file": "angular__agno__guides__voice-multimodal.md",
@@ -93,7 +93,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/guides/human-in-the-loop": {
       "file": "angular__agno__guides__human-in-the-loop.md",
@@ -105,7 +105,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/guides/shared-state": {
       "file": "angular__agno__guides__shared-state.md",
@@ -117,7 +117,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/guides/threads-memory-attachments-headless": {
       "file": "angular__agno__guides__threads-memory-attachments-headless.md",
@@ -132,7 +132,7 @@
       ],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/guides/troubleshooting": {
       "file": "angular__agno__guides__troubleshooting.md",
@@ -142,17 +142,17 @@
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/cli": {
       "file": "angular__agno__cli.md",
-      "sha256": "006d659448e8fdd914377a912118f3ba1c800dfa90546d95eee0430f6f4ce961",
-      "bytes": 8541,
+      "sha256": "8b1717b2a8e6df0ea57a175dc50952a1b12c9a456c30f3cc8ed7e5e20b5fbc6f",
+      "bytes": 8525,
       "lines": 187,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/build-with-agents": {
       "file": "angular__agno__build-with-agents.md",
@@ -162,17 +162,17 @@
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/premium/threads-explained": {
       "file": "angular__agno__premium__threads-explained.md",
-      "sha256": "0efcff410faf527e6a9a9007017780be858cf9b0e4c4ae647ff723201f46a796",
-      "bytes": 10667,
+      "sha256": "8d3f9d1c2685ab8fd87f027207be28335683d31971ace10fa209f2afa2d769c6",
+      "bytes": 10628,
       "lines": 162,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/inspector": {
       "file": "angular__agno__inspector.md",
@@ -182,87 +182,87 @@
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/premium/overview": {
       "file": "angular__agno__premium__overview.md",
-      "sha256": "dac2bf6067b350022b69d2abc88791f9b583f08fc96f3ff129466c596e296b8e",
-      "bytes": 5343,
+      "sha256": "8e1f0b6ca3524e71423d998da70f017fc9cfeb8b0e6047d4e8dc65f700463109",
+      "bytes": 5286,
       "lines": 76,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/premium/managed-intelligence-platform": {
       "file": "angular__agno__premium__managed-intelligence-platform.md",
-      "sha256": "688a3cb1529018bd3648a018f4c41d00b9eb6b67b9cd74f9dc486cdf684e0990",
-      "bytes": 8430,
+      "sha256": "125c2f4a519f8009953c208520830b6a73ab6db35d1b512d3b0e15cb466982f8",
+      "bytes": 8356,
       "lines": 127,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/premium/connect-your-runtime": {
       "file": "angular__agno__premium__connect-your-runtime.md",
-      "sha256": "2c4cca276edda2074ceb980f62ce2fb9e258d843799ecd8d0ab5935a551a5455",
-      "bytes": 4079,
-      "lines": 108,
+      "sha256": "24f0a377eae539a48e72fc4daa7369af794f8257ef266feda00316745f222f8d",
+      "bytes": 4115,
+      "lines": 109,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/premium/self-hosting": {
       "file": "angular__agno__premium__self-hosting.md",
-      "sha256": "eb5eb5fb41f703b23c025f3f16e6ee4beacd8017e446ff8e591cfb4185817ab2",
-      "bytes": 31213,
+      "sha256": "d6f25bc164345c84b6bb26f4da6366549040595c1d1a53bb99f117f166249902",
+      "bytes": 31136,
       "lines": 572,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/premium/intelligence-platform": {
       "file": "angular__agno__premium__intelligence-platform.md",
-      "sha256": "40b8a446ed4601d6a25341a01022f42f81cfc8a934e38b0f165b4b9c54b2abbf",
-      "bytes": 6194,
+      "sha256": "bcf57082a33e686f2f07662ea481b4ee2991361df8e8115162fa3dd66661e21f",
+      "bytes": 6116,
       "lines": 86,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/copilot-runtime": {
       "file": "angular__agno__copilot-runtime.md",
-      "sha256": "2d5f3391c2fc3c1ebfbf5bb5903263e610a4a3000ad0ebb3305b2c6793763a64",
-      "bytes": 7469,
+      "sha256": "8c8824ee5c1fa16fa0d3d897c690395106846427ad31c381eab52fd9f645733e",
+      "bytes": 7447,
       "lines": 195,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/ag-ui": {
       "file": "angular__agno__ag-ui.md",
-      "sha256": "4a85d16d0c1475b204de7a6e0a2a73a41b6699c2a350f3e1d7f3da7167c7473c",
-      "bytes": 4195,
+      "sha256": "731b11a7229ac100b19a5124371dfc6405b531ed8df0ad5bb9e54c58e8ab9e16",
+      "bytes": 4184,
       "lines": 130,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/troubleshooting/common-issues": {
       "file": "angular__agno__troubleshooting__common-issues.md",
-      "sha256": "4738ae0ebc718c558db52c23905bc6159e1b1c1a2a3162d7ac2d553ec5b4a7c6",
-      "bytes": 7267,
+      "sha256": "a30a84c0c001771c91645867ea9aae83cf89c8a193a2768962eb86b4c26e65eb",
+      "bytes": 7264,
       "lines": 213,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/telemetry": {
       "file": "angular__agno__telemetry.md",
@@ -272,7 +272,7 @@
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/agentic-protocols": {
       "file": "angular__agno__agentic-protocols.md",
@@ -282,7 +282,7 @@
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/auth": {
       "file": "angular__agno__auth.md",
@@ -292,17 +292,17 @@
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/concepts/architecture": {
       "file": "angular__agno__concepts__architecture.md",
-      "sha256": "98d5775f0eb817f1b09b3c8ba7c407cf5cedc755de40161e5e91a1647b3e13bd",
-      "bytes": 4700,
+      "sha256": "d7eaba82dfeaade6379dbe629b5fa4898c9e9a256582f157bfc5de195e0635f3",
+      "bytes": 4669,
       "lines": 67,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     },
     "/angular/agno/contributing/code-contributions": {
       "file": "angular__agno__contributing__code-contributions.md",
@@ -312,11 +312,11 @@
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Mon, 24 Aug 2026 16:05:32 GMT"
+      "date": "Wed, 26 Aug 2026 19:44:26 GMT"
     }
   },
   "sitemap": {
-    "fetchedAt": "2026-08-24T16:05:32.326Z",
+    "fetchedAt": "2026-08-26T19:44:26.487Z",
     "urlsUnderRoot": 154,
     "knownUnmapped": [
       "https://docs.copilotkit.ai/angular/using-these-docs",

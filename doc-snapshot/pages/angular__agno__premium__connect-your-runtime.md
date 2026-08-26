@@ -1,6 +1,6 @@
 # Connect your runtime to Intelligence
 
-> Wire an existing CopilotKit runtime to the Enterprise Intelligence Platform — construct CopilotKitIntelligence with a project API key, identify users, and confirm the credential is actually being used.
+> Wire an existing CopilotKit runtime to CopilotKit Intelligence — construct CopilotKitIntelligence with a project API key, identify users, and confirm the credential is actually being used.
 
 Connecting a runtime to Intelligence takes two things: construct a
 `CopilotKitIntelligence` client with your project API key, and pass it to your
@@ -8,7 +8,7 @@ runtime as `intelligence`. The runtime reads the key from the client you pass,
 not from the environment.
 
 This page is that wiring step. For what the platform is and why you would use it,
-see the [Enterprise Intelligence Platform overview](/angular/agno/premium/overview) and the
+see the [CopilotKit Intelligence overview](/angular/agno/premium/overview) and the
 [architecture page](/angular/agno/premium/intelligence-platform).
 
 ## Before you start
@@ -55,6 +55,7 @@ const runtime = new CopilotRuntime({
   // Threads are per-user. Without this every visitor shares one history.
   identifyUser: (request) => ({
     id: request.headers.get("x-user-id") ?? "anonymous",
+    name: request.headers.get("x-user-name") ?? "Anonymous",
   }),
 });
 
@@ -94,7 +95,7 @@ Pass the bare websocket base: the client appends `/runner` and `/client` itself,
 and prepends `/api` to every REST call. Passing `apiUrl: ".../api"` produces
 double-prefixed `/api/api/threads`.
 
-See [Self-Hosting Enterprise Intelligence](/angular/agno/premium/self-hosting) for the full
+See [Self-host CopilotKit Intelligence](/angular/agno/premium/self-hosting) for the full
 deployment path.
 
 ## Troubleshooting

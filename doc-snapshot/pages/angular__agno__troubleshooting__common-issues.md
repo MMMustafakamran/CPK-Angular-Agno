@@ -205,7 +205,7 @@ for what each bound covers and what it deliberately does not.
 `InMemoryAgentRunner evicted in-memory thread history...` means the bounds are
 doing their job — the process is safe, but that thread's scrollback is gone and
 will not come back. If losing history matters, move to a durable runner:
-[Self-Hosting Enterprise Intelligence](/angular/agno/premium/self-hosting), or your own
+[Self-host CopilotKit Intelligence](/angular/agno/premium/self-hosting), or your own
 [custom runner](/angular/agno/backend/agent-runner#extending-a-runner-for-a-custom-backend)
 backed by your datastore.
 </Accordion>
