@@ -12,6 +12,10 @@ dependencies = [
     "openai>=3.0.0",
     "python-dotenv>=1.2.2",
     "python-multipart>=0.0.32",
-    "sqlalchemy>=2.0.52",
+    # The asyncio extra, not bare sqlalchemy: Agno stores sessions through
+    # SQLAlchemy asyncio, which refuses to import without greenlet. A normal run
+    # got greenlet incidentally from the lock; an upgrade run resolved a tree
+    # without it and the agent died at import with ModuleNotFoundError.
+    "sqlalchemy[asyncio]>=2.0.52",
     "uvicorn>=0.52.1",
 ]
