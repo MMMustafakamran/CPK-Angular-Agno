@@ -26,6 +26,11 @@ const runtime = new CopilotRuntime({
     support: new AgnoAgent({ url: agentUrl }),
   },
   a2ui: {},
+  // Threads are per-user. Without this every visitor shares one history.
+  identifyUser: (request) => ({
+    id: request.headers.get("x-user-id") ?? "anonymous",
+    name: request.headers.get("x-user-name") ?? "Anonymous",
+  }),
 });
 
 const port = Number(process.env["PORT"] ?? 8200);
