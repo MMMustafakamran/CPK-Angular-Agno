@@ -11,8 +11,6 @@
     "gen:sources": "tsx scripts/generate-sources.ts",
     "doc:sync": "tsx scripts/sync-docs.ts",
     "doc:check": "tsx scripts/sync-docs.ts --check",
-    "deps:check": "npx npm-check-updates --peer",
-    "deps:update": "npx npm-check-updates -u --peer && npm install",
     "prestart": "npm run gen:sources",
     "prebuild": "npm run gen:sources",
     "runtime": "tsx server.ts",

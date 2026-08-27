@@ -109,15 +109,39 @@ Then edit `backend/.env`:
 
 **5. Update to latest packages (optional)**
 
-To upgrade packages across frontend and backend while respecting peer dependency constraints:
+Check before you bump. The report is read-only and sorts what is outdated into
+the only three things it can be, of which just one is actionable:
+
+```bash
+node ci/check-versions.mjs
+```
+
+| Cause | Do |
+|---|---|
+| Our range is behind | Bump it, on a branch — below |
+| An upstream package **exact-pins** an older version | Nothing. Report it upstream |
+| A **peerDependency** forbids the newer one | Nothing. Bumping breaks the build |
+
+`@copilotkit/angular` exact-pins `@copilotkit/core@1.66.0`, and Angular 22
+requires `typescript >=6.0 <6.1` — so TypeScript reads a full major behind and
+must stay there. The nightly publishes this report on its own; see
+[`ci/VERSION-WATCH.md`](ci/VERSION-WATCH.md).
 
 **Frontend:**
 ```bash
-cd frontend
-npm run deps:update
-cd ..
+git checkout -b chore/bump-<package>
+npm --prefix frontend install <package>@<version>
+git diff frontend/package-lock.json   # one bump can drag in dozens of transitives
+npm --prefix frontend run build
 ```
-*(Or directly: `npx npm-check-updates -u --peer && npm install`)*
+
+Then record the affected pages before merging — verifying the docs still run is
+what this repo is for. Revert with
+`git checkout frontend/package-lock.json && npm ci`.
+
+Note that `@ag-ui/agno` is declared `^0.0.5`, and a caret on a `0.0.x` package
+allows *only* that version. It cannot move on its own; it needs the hand edit
+above.
 
 **Backend:**
 ```bash
@@ -126,6 +150,12 @@ uv lock --upgrade
 uv sync
 cd ..
 ```
+
+Not `npx npm-check-updates -u`: it rewrites `package.json` to the newest release
+of everything, ignoring the declared ranges, and walks straight into the peer
+conflict above. Not `npm install --legacy-peer-deps` either — it does not fix a
+peer conflict, it hides one, silencing the exact signal this harness reports on.
+Dependabot is the safe alternative if PR-based automation is wanted.
 
 **Default ports:** frontend **4200**, runtime **8200**, agent **8000**.
 

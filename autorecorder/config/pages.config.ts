@@ -49,8 +49,8 @@ export const PAGES = definePages([
     // versions it ran against, and @copilotkit/angular is a 0.x package that
     // moves faster than its docs do.
     ideFile: 'frontend/package.json',
-    startLine: 19,
-    endLine: 36,
+    startLine: 17,
+    endLine: 34,
     // Then the path itself: the chat component, the Node process hosting the
     // runtime (Angular has no server route to host it in), and the Agno agent.
     extraTabs: [

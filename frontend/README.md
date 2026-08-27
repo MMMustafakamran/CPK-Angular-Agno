@@ -38,12 +38,29 @@ This will compile your project and store the build artifacts in the `dist/` dire
 
 ## Updating dependencies
 
-To upgrade all dependencies to their latest versions:
+Check first, from the repo root:
 
 ```bash
-npx npm-check-updates -u
-npm install
+node ../ci/check-versions.mjs
 ```
+
+It classifies what is outdated, because only one of the three reasons a package
+can be behind is ours to act on — the other two are an upstream exact pin and a
+peerDependency that forbids the newer version. `@copilotkit/angular` exact-pins
+`@copilotkit/core`, and Angular 22 pins TypeScript to `>=6.0 <6.1`, so the
+`Latest` column is not a to-do list here.
+
+To bump something the report says is ours:
+
+```bash
+git checkout -b chore/bump-<package>
+npm install <package>@<version>
+npm run build
+```
+
+Do not run `npx npm-check-updates -u`: it rewrites `package.json` past the
+declared ranges and breaks the Angular peer graph. See
+[`../ci/VERSION-WATCH.md`](../ci/VERSION-WATCH.md).
 
 ## Running unit tests
 
