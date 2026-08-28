@@ -27,7 +27,11 @@ import { type Page } from 'playwright';
 import { humanGlide, sleep } from '../core/overlays/cursor';
 import { ensureOverlays } from '../core/overlays/taskbar';
 import { type PageActionHandler, type PageRecordConfig } from '../core/types';
-import { closeNotepadNote, showNotepadNote } from './notepad';
+import {
+  closeNotepadNote,
+  openNotepadWindow,
+  typeInNotepad,
+} from './notepad';
 
 /**
  * The written finding, left on screen over the guide once the tour has shown
@@ -61,15 +65,10 @@ const BEAT = {
   beforeSelectMs: 2500,
   /** How long each highlight stays up. */
   holdMs: 3000,
-  /** How long the note card stays up next to a highlighted token. */
-  cardHoldMs: 4500,
   /** The closing run to the bottom of the page. */
   outroMs: 4000,
-  /**
-   * Time the finished note stays up, on top of showNotepadNote's own 4s tail.
-   * The typing is the beat here; this is just reading room at the end.
-   */
-  noteHoldMs: 2500,
+  /** Reading room after the last keystroke, before the window closes. */
+  noteHoldMs: 4000,
 } as const;
 
 /**
@@ -82,8 +81,6 @@ interface UndefinedRef {
   occurrence: number;
   /** Log line, and the beat the narration is written against. */
   note: string;
-  /** What the on-screen card says while this token is highlighted. */
-  card: string;
 }
 
 /** The identifier the clip is built around. */
@@ -91,7 +88,6 @@ const FOCUS: UndefinedRef = {
   token: 'beautifulCatalog',
   occurrence: 1,
   note: 'the beautiful-chat case returns beautifulCatalog — never defined',
-  card: 'beautifulCatalog — used here, never defined anywhere on this page',
 };
 
 /** Its neighbour in the same switch, shown without moving the page. */
@@ -99,7 +95,6 @@ const SECOND: UndefinedRef = {
   token: 'fixedCatalog',
   occurrence: 1,
   note: 'a2ui-fixed-schema returns fixedCatalog — never defined',
-  card: 'fixedCatalog — same story. no import, no definition, nothing to copy',
 };
 
 const TOKENS = [FOCUS, SECOND];
@@ -139,78 +134,6 @@ async function magnifyCodeBlocks(page: Page, factor = 1.45): Promise<void> {
   }
   // Let the reflow settle before anything measures a token's position.
   await sleep(700);
-}
-
-/**
- * The card that says out loud what the highlight means.
- *
- * Anchored under the token rather than parked in a corner, so the claim and the
- * code it is about are read in one glance. Re-called with new text to move it.
- */
-async function showNoteCard(
-  page: Page,
-  text: string,
-  anchor: { x: number; y: number },
-): Promise<void> {
-  await page
-    .evaluate(
-      ({ body, ax, ay }) => {
-        let card = document.getElementById('a2ui-note-card');
-        if (!card) {
-          card = document.createElement('div');
-          card.id = 'a2ui-note-card';
-          card.style.cssText = [
-            'position:fixed',
-            'z-index:2147483000',
-            'max-width:520px',
-            'padding:18px 22px',
-            'border-radius:14px',
-            'border:1px solid rgba(248,113,113,.55)',
-            'background:rgba(24,10,12,.96)',
-            'box-shadow:0 18px 48px rgba(0,0,0,.55)',
-            'color:#fecaca',
-            'font:600 26px/1.35 ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif',
-            'opacity:0',
-            'transform:translateY(10px)',
-            'transition:opacity .35s ease,transform .35s ease',
-            'pointer-events:none',
-          ].join(';');
-          document.body.appendChild(card);
-        }
-        card.textContent = body;
-
-        // Clamp into the viewport: tokens near the right edge would otherwise
-        // push the card off-screen, which is where the text is needed most.
-        const width = Math.min(520, window.innerWidth - 80);
-        const left = Math.max(
-          32,
-          Math.min(ax - width / 2, window.innerWidth - width - 32),
-        );
-        card.style.left = `${left}px`;
-        card.style.top = `${Math.min(ay + 26, window.innerHeight - 160)}px`;
-
-        requestAnimationFrame(() => {
-          card!.style.opacity = '1';
-          card!.style.transform = 'translateY(0)';
-        });
-      },
-      { body: text, ax: anchor.x, ay: anchor.y },
-    )
-    .catch(() => {});
-  await sleep(500);
-}
-
-/** Fades the note card back out between beats. */
-async function hideNoteCard(page: Page): Promise<void> {
-  await page
-    .evaluate(() => {
-      const card = document.getElementById('a2ui-note-card');
-      if (!card) return;
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(10px)';
-    })
-    .catch(() => {});
-  await sleep(400);
 }
 
 /**
@@ -492,6 +415,50 @@ async function selectToken(page: Page, rect: TokenRect): Promise<void> {
   );
 }
 
+/**
+ * Repaints a selection as a fixed overlay so it survives the next click.
+ *
+ * A real text selection is the right way to *make* the highlight — the drag is
+ * what the viewer reads as a person marking a word. But opening Notepad clicks
+ * the page, and any click collapses the selection, so the token went un-marked
+ * for exactly the stretch where the note explains it. This draws the same blue
+ * box and nothing can clear it but us.
+ */
+async function pinHighlight(page: Page, rect: TokenRect): Promise<void> {
+  await page
+    .evaluate(
+      ({ left, right, y }) => {
+        const box = document.createElement('div');
+        box.className = 'a2ui-pinned-highlight';
+        box.style.cssText = [
+          'position:fixed',
+          `left:${left - 2}px`,
+          `top:${y - 15}px`,
+          `width:${right - left + 4}px`,
+          'height:30px',
+          'background:rgba(59,130,246,.45)',
+          'border-radius:3px',
+          'z-index:2147483000',
+          'pointer-events:none',
+        ].join(';');
+        document.body.appendChild(box);
+      },
+      { left: rect.left, right: rect.right, y: rect.y },
+    )
+    .catch(() => {});
+}
+
+/** Removes every pinned highlight. */
+async function unpinHighlights(page: Page): Promise<void> {
+  await page
+    .evaluate(() => {
+      document
+        .querySelectorAll('.a2ui-pinned-highlight')
+        .forEach((el) => el.remove());
+    })
+    .catch(() => {});
+}
+
 /** Clears the highlight before the next beat, so selections never stack up. */
 async function clearSelection(page: Page): Promise<void> {
   await page
@@ -541,43 +508,49 @@ export const runA2uiAction: PageActionHandler = async (
   } else {
     console.log(`   ↧ ${FOCUS.token}: ${FOCUS.note}`);
     await selectToken(page, rect);
-    await sleep(1200);
-    await showNoteCard(page, FOCUS.card, { x: rect.x, y: rect.y });
-    await sleep(BEAT.cardHoldMs);
-    await hideNoteCard(page);
+    await sleep(BEAT.holdMs);
     await clearSelection(page);
     await sleep(600);
   }
 
   // The second one, in the same snippet and without scrolling: one undefined
-  // name could be an oversight, two in one switch is the page.
+  // name could be an oversight, two in one switch is the page. Its highlight
+  // stays up for the rest of the clip -- the note is written *about* it, so
+  // clearing it first would leave the writing pointing at nothing.
   const second = await locateToken(page, SECOND.token, 1);
   if (!second) {
     missing.push(SECOND.token);
   } else {
     console.log(`   ↧ ${SECOND.token}: ${SECOND.note}`);
     await selectToken(page, second);
-    await sleep(1200);
-    await showNoteCard(page, SECOND.card, { x: second.x, y: second.y });
-    await sleep(BEAT.cardHoldMs);
-    await hideNoteCard(page);
-    await clearSelection(page);
-    await sleep(600);
+    await sleep(BEAT.holdMs);
+    // Hand the mark over to an overlay before anything clicks.
+    await pinHighlight(page, second);
   }
+
+  // Write the finding out by hand instead of flashing a caption over it. The
+  // window is parked hard right so the highlighted `fixedCatalog` stays visible
+  // to its left: the claim and the code it is about share the frame, and the
+  // typing gives the voiceover something to run against.
+  await openNotepadWindow(page, 'a2ui-notes.txt', {
+    top: '150px',
+    right: '48px',
+    width: '560px',
+    height: '430px',
+    fontSize: '20px',
+  });
+  await typeInNotepad(page, NOTE_LINES, 1600, 260);
+  await sleep(BEAT.noteHoldMs);
+  await closeNotepadNote(page);
+  await unpinHighlights(page);
+  await clearSelection(page);
+  await sleep(600);
 
   // Close by running out the rest of the page. The claim is about what is
   // absent, and absence only reads on screen if the page ends without it.
   console.log(`   🔎 Running out the page — no definition appears...`);
   await smoothScrollTo(page, 10_000_000, BEAT.outroMs);
   await sleep(1200);
-
-  // Write it down, over the page rather than after it: the bottom of the guide
-  // stays visible behind the window, so the note and the thing it is about are
-  // on screen together.
-  await showNotepadNote(page, 'a2ui-notes.txt', NOTE_LINES);
-  await sleep(BEAT.noteHoldMs);
-  await closeNotepadNote(page);
-  await sleep(800);
 
   if (missing.length === TOKENS.length) {
     // Every identifier gone at once is the guide being rewritten, not a flaky
