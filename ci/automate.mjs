@@ -212,19 +212,59 @@ function tailLog(logPath, lines = 25) {
   }
 }
 
+/**
+ * Every way one `localhost` URL can actually be reached.
+ *
+ * `localhost` is two addresses, and a dev server binds only one of them: the
+ * Angular server here listens on `[::1]` alone, while Node's fetch resolves
+ * `localhost` to `127.0.0.1` and gets a refusal - so a server a browser opens
+ * fine polls as dead for the full 180s timeout. Both literals are tried,
+ * carrying `Host: localhost:<port>` because Angular's SSRF guard rejects a
+ * bracketed-IPv6 Host outright ("Header host with value [::1]:4200 is not
+ * allowed") - which is a *response*, and would otherwise read as healthy.
+ *
+ * Non-localhost URLs are returned untouched: 127.0.0.1 needs no help.
+ */
+function healthProbeTargets(url) {
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return [{ url, headers: undefined }];
+  }
+  if (parsed.hostname !== 'localhost') return [{ url, headers: undefined }];
+
+  const hostHeader = { host: parsed.host };
+  const swap = (literal) => {
+    const u = new URL(parsed.toString());
+    u.hostname = literal;
+    return { url: u.toString(), headers: hostHeader };
+  };
+  return [{ url, headers: undefined }, swap('127.0.0.1'), swap('[::1]')];
+}
+
+
 async function waitForHealth(url, name, logPath, timeoutMs = 60000) {
   const start = Date.now();
+  const targets = healthProbeTargets(url);
   process.stdout.write(`⏳ Waiting for ${name} (${url})... `);
   while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(2000) });
-      if (res.ok || res.status < 500) {
-        const elapsed = ((Date.now() - start) / 1000).toFixed(1);
-        process.stdout.write(`✅ READY (${elapsed}s)!\n`);
-        return { ok: true, elapsedSec: Number(elapsed) };
+    for (const target of targets) {
+      try {
+        const res = await fetch(target.url, {
+          headers: target.headers,
+          signal: AbortSignal.timeout(2000),
+        });
+        if (res.ok || res.status < 500) {
+          const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+          const via =
+            target.url === url ? '' : ` via ${new URL(target.url).host}`;
+          process.stdout.write(`✅ READY (${elapsed}s)${via}!\n`);
+          return { ok: true, elapsedSec: Number(elapsed) };
+        }
+      } catch {
+        // try the next address, then keep polling
       }
-    } catch {
-      // keep polling
     }
     await new Promise((resolve) => setTimeout(resolve, 1000));
     process.stdout.write('.');

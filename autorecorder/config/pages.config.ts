@@ -138,10 +138,14 @@ export const PAGES = definePages([
     extraTabs: [{ filePath: 'frontend/server.ts', startLine: 22, endLine: 30 }],
     // Recorded as a documented finding rather than a working demo: the renderer
     // only registers once `a2ui.catalog` is supplied, and the guide's catalog
-    // snippet is not self-contained. The handler reads the doc and writes the
-    // gaps up in Notepad instead of prompting — see actions/a2ui.action.ts.
+    // snippets are not self-contained. The handler goes back to the live guide
+    // and walks a reader through each undefined identifier, selecting it and
+    // then sweeping the page to show it is defined nowhere — see
+    // actions/a2ui.action.ts. It is narrated; `ci/lib/mux.mjs` muxes
+    // autorecorder/audio/a2ui-angular.m4a over the clip when that file exists.
     // The prompt is kept so the entry stays valid and so re-enabling the chat
-    // turn is a one-line change once a catalog exists.
+    // turn is a one-line change once a catalog exists; the handler does not
+    // send it.
     prompt: 'Show me a card comparing two flight options.',
     waitAfterPromptMs: 4000,
   },

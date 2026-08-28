@@ -6,7 +6,7 @@
  * muxed the same track onto the already-muxed file. Muxing happens once, where
  * the video is produced; the workflow just installs ffmpeg and lets this run.
  *
- * Two pages carry a voiceover: Shared State and Threads. The tracks live in
+ * Three pages carry a voiceover: Shared State, Threads and A2UI. The tracks live in
  * `autorecorder/audio/` and are shared verbatim by all three Angular repos —
  * the narration is about the CopilotKit concept, not the agent framework behind
  * it, so the same recording fits AGNO-, MASTRA- and MSPY-angular. Every other
@@ -39,6 +39,15 @@ const AUDIO_TRACKS = [
   {
     audioFile: 'thread-angular.m4a',
     videoMatch: 'Threads',
+  },
+  {
+    // The A2UI clip is a narrated read of the guide's undefined catalog
+    // identifiers, so it is voiceover-first: the pauses in
+    // autorecorder/actions/a2ui.action.ts are the script's timing. The track is
+    // not committed yet — a missing file is filtered out below, so this entry
+    // is inert until the recording is dropped into autorecorder/audio/.
+    audioFile: 'a2ui-angular.m4a',
+    videoMatch: 'A2ui',
   },
 ];
 
