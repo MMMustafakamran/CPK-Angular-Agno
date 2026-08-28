@@ -61,8 +61,8 @@ const BEAT = {
   beforeSelectMs: 2500,
   /** How long each highlight stays up. */
   holdMs: 3000,
-  /** Short repositioning scrolls between identifiers. */
-  hopMs: 1800,
+  /** How long the note card stays up next to a highlighted token. */
+  cardHoldMs: 4500,
   /** The closing run to the bottom of the page. */
   outroMs: 4000,
   /**
@@ -82,30 +82,136 @@ interface UndefinedRef {
   occurrence: number;
   /** Log line, and the beat the narration is written against. */
   note: string;
+  /** What the on-screen card says while this token is highlighted. */
+  card: string;
 }
 
-const NARROW_REFS: UndefinedRef[] = [
-  {
-    token: 'beautifulCatalog',
-    occurrence: 1,
-    note: 'the beautiful-chat case returns beautifulCatalog — never defined',
-  },
-  {
-    token: 'fixedCatalog',
-    occurrence: 1,
-    note: 'a2ui-fixed-schema returns fixedCatalog — never defined',
-  },
-  {
-    token: 'dynamicString',
-    occurrence: 1,
-    note: 'fixedDefinitions builds its Zod props out of dynamicString — never defined, never imported',
-  },
-  {
-    token: 'productCatalog',
-    occurrence: 1,
-    note: 'app.config.ts hands productCatalog to provideCopilotKit — never defined',
-  },
-];
+/** The identifier the clip is built around. */
+const FOCUS: UndefinedRef = {
+  token: 'beautifulCatalog',
+  occurrence: 1,
+  note: 'the beautiful-chat case returns beautifulCatalog — never defined',
+  card: 'beautifulCatalog — used here, never defined anywhere on this page',
+};
+
+/** Its neighbour in the same switch, shown without moving the page. */
+const SECOND: UndefinedRef = {
+  token: 'fixedCatalog',
+  occurrence: 1,
+  note: 'a2ui-fixed-schema returns fixedCatalog — never defined',
+  card: 'fixedCatalog — same story. no import, no definition, nothing to copy',
+};
+
+const TOKENS = [FOCUS, SECOND];
+
+/**
+ * Blows the code blocks up until they are readable on video.
+ *
+ * This is the single thing that made earlier cuts useless. The docs render code
+ * at ~13px; in a 1920x1080 capture that is illegible on playback, so a tour that
+ * highlights one identifier was pointing at a grey smudge. Zooming only `pre`
+ * leaves the Fumadocs scroller, sticky header and heading offsets alone — a zoom
+ * on `html` reflows all of them and the scroll targets stop landing.
+ *
+ * `zoom` (not `transform: scale`) on purpose: it participates in layout, so
+ * `getBoundingClientRect` and `page.mouse` still agree on where a token is.
+ */
+async function magnifyCodeBlocks(page: Page, factor = 1.45): Promise<void> {
+  // A stylesheet, not inline styles on the nodes. Fumadocs re-renders the code
+  // blocks during hydration, which throws away anything written to
+  // `pre.style` -- the first cut that "zoomed" did exactly that and shipped a
+  // page of 13px code. A rule in a <style> tag applies to whatever `pre` exists
+  // at paint time, including the replacements.
+  const ok = (await page
+    .evaluate((z) => {
+      const style = document.createElement('style');
+      style.id = 'a2ui-magnify';
+      style.textContent = `pre { zoom: ${z} !important; }`;
+      document.head.appendChild(style);
+      return document.querySelectorAll('pre').length;
+    }, factor)
+    .catch(() => 0)) as number;
+
+  if (ok === 0) {
+    console.warn(
+      `   ⚠️ No <pre> blocks to magnify — the clip will be unreadable.`,
+    );
+  }
+  // Let the reflow settle before anything measures a token's position.
+  await sleep(700);
+}
+
+/**
+ * The card that says out loud what the highlight means.
+ *
+ * Anchored under the token rather than parked in a corner, so the claim and the
+ * code it is about are read in one glance. Re-called with new text to move it.
+ */
+async function showNoteCard(
+  page: Page,
+  text: string,
+  anchor: { x: number; y: number },
+): Promise<void> {
+  await page
+    .evaluate(
+      ({ body, ax, ay }) => {
+        let card = document.getElementById('a2ui-note-card');
+        if (!card) {
+          card = document.createElement('div');
+          card.id = 'a2ui-note-card';
+          card.style.cssText = [
+            'position:fixed',
+            'z-index:2147483000',
+            'max-width:520px',
+            'padding:18px 22px',
+            'border-radius:14px',
+            'border:1px solid rgba(248,113,113,.55)',
+            'background:rgba(24,10,12,.96)',
+            'box-shadow:0 18px 48px rgba(0,0,0,.55)',
+            'color:#fecaca',
+            'font:600 26px/1.35 ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif',
+            'opacity:0',
+            'transform:translateY(10px)',
+            'transition:opacity .35s ease,transform .35s ease',
+            'pointer-events:none',
+          ].join(';');
+          document.body.appendChild(card);
+        }
+        card.textContent = body;
+
+        // Clamp into the viewport: tokens near the right edge would otherwise
+        // push the card off-screen, which is where the text is needed most.
+        const width = Math.min(520, window.innerWidth - 80);
+        const left = Math.max(
+          32,
+          Math.min(ax - width / 2, window.innerWidth - width - 32),
+        );
+        card.style.left = `${left}px`;
+        card.style.top = `${Math.min(ay + 26, window.innerHeight - 160)}px`;
+
+        requestAnimationFrame(() => {
+          card!.style.opacity = '1';
+          card!.style.transform = 'translateY(0)';
+        });
+      },
+      { body: text, ax: anchor.x, ay: anchor.y },
+    )
+    .catch(() => {});
+  await sleep(500);
+}
+
+/** Fades the note card back out between beats. */
+async function hideNoteCard(page: Page): Promise<void> {
+  await page
+    .evaluate(() => {
+      const card = document.getElementById('a2ui-note-card');
+      if (!card) return;
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(10px)';
+    })
+    .catch(() => {});
+  await sleep(400);
+}
 
 /**
  * Resolves the element that actually scrolls on the docs site and stashes it.
@@ -117,65 +223,129 @@ const NARROW_REFS: UndefinedRef[] = [
 async function resolveDocScroller(page: Page): Promise<void> {
   await page
     .evaluate(() => {
-      const candidates = [
-        document.getElementById('nd-docs-layout'),
-        document.querySelector('main'),
-        document.querySelector('article'),
-      ];
-      const nested = candidates.find(
-        (el) =>
-          el instanceof HTMLElement && el.scrollHeight > el.clientHeight + 40,
-      ) as HTMLElement | undefined;
-      (window as any).__a2uiScroller = nested ?? null;
+      // A FUNCTION, not the element. Fumadocs swaps #nd-docs-layout during
+      // hydration, so an element captured once is detached moments later --
+      // and a detached node accepts scrollTop writes, reports 0 forever, and
+      // never throws. That is what pinned every earlier cut to the top of the
+      // page while the logs reported a clean run. Re-query on every access.
+      (window as any).__a2uiScroller = () =>
+        (document.getElementById('nd-docs-layout') ??
+          Array.from(document.querySelectorAll('main, article, div')).find(
+            (el) =>
+              el instanceof HTMLElement &&
+              el.scrollHeight > el.clientHeight + 40 &&
+              /auto|scroll/.test(getComputedStyle(el).overflowY),
+          ) ??
+          null) as HTMLElement | null;
     })
     .catch(() => {});
 }
 
+/** Current offset of the doc scroller. */
+async function scrollPos(page: Page): Promise<number> {
+  return (await page
+    .evaluate(() => {
+      const el = (window as any).__a2uiScroller?.() as HTMLElement | null;
+      return el ? el.scrollTop : window.scrollY;
+    })
+    .catch(() => 0)) as number;
+}
+
 /**
- * Eased scroll to an absolute offset.
+ * Eased scroll to an absolute offset, driven by real wheel events.
  *
- * Cubic in-out rather than linear: the ease-out at the end is what makes a long
- * descent land on the snippet instead of stopping dead on it.
+ * NOT `el.scrollTop = y`. This layout accepts the assignment, reports no error
+ * and does not move — `#nd-docs-layout` reads back 0 immediately afterwards, so
+ * earlier cuts recorded a page frozen at the top while the log happily reported
+ * every identifier "found" (the TreeWalker locates tokens whether or not they
+ * are on screen, so the selection drags were happening off-screen). Wheel events
+ * go through the compositor and actually scroll it; `core/overlays/cursor.ts`
+ * hit the same wall and says so.
+ *
+ * Cubic in-out rather than linear: the ease-out is what makes a long descent
+ * land on the snippet instead of stopping dead on it.
  */
 async function smoothScrollTo(
   page: Page,
   targetTop: number,
   durationMs: number,
 ): Promise<void> {
-  await page
-    .evaluate(
-      async ({ target, duration }) => {
-        const el = (window as any).__a2uiScroller as HTMLElement | null;
-        const read = () => (el ? el.scrollTop : window.scrollY);
-        const write = (y: number) => {
-          if (el) el.scrollTop = y;
-          else window.scrollTo(0, y);
-        };
+  const start = await scrollPos(page);
+  const max = (await page
+    .evaluate(() => {
+      const el = (window as any).__a2uiScroller?.() as HTMLElement | null;
+      return el
+        ? el.scrollHeight - el.clientHeight
+        : Math.max(
+            0,
+            document.documentElement.scrollHeight - window.innerHeight,
+          );
+    })
+    .catch(() => 0)) as number;
 
-        const start = read();
-        const max = el
-          ? el.scrollHeight - el.clientHeight
-          : Math.max(
-              0,
-              document.documentElement.scrollHeight - window.innerHeight,
-            );
-        const end = Math.max(0, Math.min(target, max));
-        const distance = end - start;
-        if (Math.abs(distance) < 8) return;
+  const end = Math.max(0, Math.min(targetTop, max));
+  const distance = end - start;
+  if (Math.abs(distance) < 8) return;
 
-        const steps = Math.max(24, Math.round(duration / 16));
-        for (let i = 1; i <= steps; i++) {
-          const t = i / steps;
-          const progress =
-            t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-          write(start + distance * progress);
-          await new Promise((r) => setTimeout(r, duration / steps));
+  const steps = 60;
+  const tick = Math.max(16, durationMs / steps);
+  let previous = 0;
+
+  // Neither scroll method works everywhere, so prove one on the first real tick
+  // and keep it. Wheel is preferred (it keeps the compositor's own smoothing),
+  // but the recorder's chrome overlay swallows it on this layout; bare Chromium
+  // does not, which is why this only reproduced inside a recording. The
+  // fallback must be `+= dy` — assigning an absolute scrollTop is accepted and
+  // ignored here. Same discovery as core/overlays/cursor.ts.
+  let useWheel = true;
+  let proven = false;
+
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const progress =
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const delta = Math.round((progress - previous) * distance);
+    previous = progress;
+
+    if (delta !== 0) {
+      if (useWheel) {
+        // Skip the probe on the ease-in's sub-pixel opening ticks: they move
+        // nothing either way and would wrongly condemn the wheel.
+        const canProve = !proven && Math.abs(delta) >= 3;
+        const before = canProve ? await scrollPos(page) : 0;
+
+        await page.mouse.wheel(0, delta);
+
+        if (canProve) {
+          proven = true;
+          if (Math.abs((await scrollPos(page)) - before) < 1) useWheel = false;
         }
-      },
-      { target: targetTop, duration: durationMs },
-    )
-    .catch(() => {});
+      }
+
+      if (!useWheel) {
+        await page
+          .evaluate((dy) => {
+            const el = (window as any).__a2uiScroller?.() as HTMLElement | null;
+            if (el) el.scrollTop += dy;
+            else window.scrollBy(0, dy);
+          }, delta)
+          .catch(() => {});
+      }
+    }
+
+    await sleep(tick);
+  }
+
   await sleep(250);
+
+  // Loud on failure. A scroll that silently does nothing is the exact defect
+  // this function exists to fix, and it is invisible in the logs otherwise.
+  const landed = await scrollPos(page);
+  if (Math.abs(landed - end) > 150) {
+    console.warn(
+      `   ⚠️ Scroll landed at ${Math.round(landed)}, wanted ${Math.round(end)} — the doc layout may have changed its scroller.`,
+    );
+  }
 }
 
 interface TokenRect {
@@ -206,7 +376,7 @@ async function locateToken(
   return (await page
     .evaluate(
       ({ needle, nth }) => {
-        const scroller = (window as any).__a2uiScroller as HTMLElement | null;
+        const scroller = (window as any).__a2uiScroller?.() as HTMLElement | null;
         const roots = Array.from(
           document.querySelectorAll('pre, code'),
         ) as HTMLElement[];
@@ -345,61 +515,54 @@ export const runA2uiAction: PageActionHandler = async (
   await ensureOverlays(page, 'chrome');
   await resolveDocScroller(page);
 
+  await magnifyCodeBlocks(page);
+  await humanGlide(page, 960, 620, 26);
+
   // Rest on the title before moving: the page reflows once as fonts and the
   // sidebar land, and a cursor glide started into that reflow lands nowhere.
   await sleep(BEAT.settleMs);
 
   const missing: string[] = [];
 
-  // One uninterrupted descent to the catalog-selection snippet. Everything
-  // after this is small moves within a page the viewer has already arrived at.
-  const blockStart = await bringIntoView(
-    page,
-    'beautifulCatalog',
-    1,
-    BEAT.descentMs,
-  );
+  // One uninterrupted descent to the catalog-selection snippet, and then the
+  // tour stays there. Earlier cuts visited five identifiers scattered across
+  // the page, which meant scrolling down, back up for `dynamicString`, then
+  // down again -- on screen that reads as hunting, not as an argument. Both
+  // catalogs below live in the same `a2uiConfigForFeature` block, so once the
+  // descent lands nothing moves again until the closing sweep.
+  const rect = await bringIntoView(page, FOCUS.token, 1, BEAT.descentMs);
   await sleep(BEAT.beforeSelectMs);
 
-  // The whole `a2uiConfigForFeature` body first: four returns, four catalogs,
-  // none of them defined. Dragging beautifulCatalog -> fixedCatalog spans the
-  // switch cases in between, which is the shape of the claim.
-  const blockEnd = await locateToken(page, 'fixedCatalog', 1);
-  if (blockStart && blockEnd) {
-    console.log(
-      `   ▭ a2uiConfigForFeature returns four catalogs; the guide defines none of them`,
+  if (!rect) {
+    missing.push(FOCUS.token);
+    console.warn(
+      `   ⚠️ '${FOCUS.token}' not found on the live page — the guide may have been fixed.`,
     );
-    await dragSelect(
-      page,
-      { x: Math.max(2, blockStart.left - 6), y: blockStart.y },
-      { x: blockEnd.right + 6, y: blockEnd.y },
-    );
-    await sleep(BEAT.holdMs);
+  } else {
+    console.log(`   ↧ ${FOCUS.token}: ${FOCUS.note}`);
+    await selectToken(page, rect);
+    await sleep(1200);
+    await showNoteCard(page, FOCUS.card, { x: rect.x, y: rect.y });
+    await sleep(BEAT.cardHoldMs);
+    await hideNoteCard(page);
     await clearSelection(page);
-    await sleep(500);
+    await sleep(600);
   }
 
-  // Then each identifier on its own, so the viewer sees the exact word.
-  for (const ref of NARROW_REFS) {
-    const rect = await bringIntoView(
-      page,
-      ref.token,
-      ref.occurrence,
-      BEAT.hopMs,
-    );
-    if (!rect) {
-      missing.push(ref.token);
-      console.warn(
-        `   ⚠️ '${ref.token}' not found on the live page — the guide may have been fixed.`,
-      );
-      continue;
-    }
-
-    console.log(`   ↧ ${ref.token}: ${ref.note}`);
-    await selectToken(page, rect);
-    await sleep(BEAT.holdMs);
+  // The second one, in the same snippet and without scrolling: one undefined
+  // name could be an oversight, two in one switch is the page.
+  const second = await locateToken(page, SECOND.token, 1);
+  if (!second) {
+    missing.push(SECOND.token);
+  } else {
+    console.log(`   ↧ ${SECOND.token}: ${SECOND.note}`);
+    await selectToken(page, second);
+    await sleep(1200);
+    await showNoteCard(page, SECOND.card, { x: second.x, y: second.y });
+    await sleep(BEAT.cardHoldMs);
+    await hideNoteCard(page);
     await clearSelection(page);
-    await sleep(500);
+    await sleep(600);
   }
 
   // Close by running out the rest of the page. The claim is about what is
@@ -416,12 +579,12 @@ export const runA2uiAction: PageActionHandler = async (
   await closeNotepadNote(page);
   await sleep(800);
 
-  if (missing.length === NARROW_REFS.length) {
+  if (missing.length === TOKENS.length) {
     // Every identifier gone at once is the guide being rewritten, not a flaky
     // lookup. The recording is then showing nothing, and that must be visible
     // in the run report rather than passing quietly.
     throw new Error(
-      `None of the undefined catalog identifiers (${NARROW_REFS.map((r) => r.token).join(', ')}) ` +
+      `None of the undefined catalog identifiers (${TOKENS.map((r) => r.token).join(', ')}) ` +
         `were found on ${config.docUrl} — the a2ui guide has changed and this tour needs rewriting.`,
     );
   }
@@ -433,6 +596,6 @@ export const runA2uiAction: PageActionHandler = async (
   }
 
   console.log(
-    `   ✅ Doc tour complete: ${NARROW_REFS.length - missing.length} undefined identifier(s) shown, none of them defined anywhere on the page.`,
+    `   ✅ Doc tour complete: ${TOKENS.length - missing.length} undefined identifier(s) shown, none of them defined anywhere on the page.`,
   );
 };
