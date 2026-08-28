@@ -27,6 +27,29 @@ import { type Page } from 'playwright';
 import { humanGlide, sleep } from '../core/overlays/cursor';
 import { ensureOverlays } from '../core/overlays/taskbar';
 import { type PageActionHandler, type PageRecordConfig } from '../core/types';
+import { closeNotepadNote, showNotepadNote } from './notepad';
+
+/**
+ * The written finding, left on screen over the guide once the tour has shown
+ * it. Lowercase and clipped on purpose: this is a person jotting down what they
+ * just hit, not a report — a formal paragraph here reads as authored narration
+ * and undercuts the "I tried to follow this page" framing the clip is built on.
+ */
+const NOTE_LINES = [
+  'a2ui guide notes',
+  '',
+  'used but never defined:',
+  '  beautifulCatalog',
+  '  declarativeCatalog',
+  '  fixedCatalog',
+  '  productCatalog',
+  '  dynamicString',
+  '',
+  'fixedDefinitions is defined but never',
+  'wrapped into fixedCatalog',
+  '',
+  'copy any snippet here and it wont compile',
+];
 
 /** Every beat's duration in one place, because they are voiceover timing. */
 const BEAT = {
@@ -42,6 +65,11 @@ const BEAT = {
   hopMs: 1800,
   /** The closing run to the bottom of the page. */
   outroMs: 4000,
+  /**
+   * Time the finished note stays up, on top of showNotepadNote's own 4s tail.
+   * The typing is the beat here; this is just reading room at the end.
+   */
+  noteHoldMs: 2500,
 } as const;
 
 /**
@@ -379,6 +407,14 @@ export const runA2uiAction: PageActionHandler = async (
   console.log(`   🔎 Running out the page — no definition appears...`);
   await smoothScrollTo(page, 10_000_000, BEAT.outroMs);
   await sleep(1200);
+
+  // Write it down, over the page rather than after it: the bottom of the guide
+  // stays visible behind the window, so the note and the thing it is about are
+  // on screen together.
+  await showNotepadNote(page, 'a2ui-notes.txt', NOTE_LINES);
+  await sleep(BEAT.noteHoldMs);
+  await closeNotepadNote(page);
+  await sleep(800);
 
   if (missing.length === NARROW_REFS.length) {
     // Every identifier gone at once is the guide being rewritten, not a flaky
