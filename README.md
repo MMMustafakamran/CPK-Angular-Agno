@@ -543,6 +543,42 @@ The step is one interaction short of what it describes, and a reader following
 it literally sees an empty panel at exactly the moment the page is telling them
 their setup is correct.
 
+**18. The context sample gives the reader nothing to observe**
+
+[Shared state](https://docs.copilotkit.ai/angular/agno/guides/shared-state)'s
+read-only context sample renders a bare **Use London time** button. Pressing it
+produces no visual change anywhere: it does not write agent state, it does not
+display the current timezone, and the component renders no value at all. A
+working button and a dead one are indistinguishable, and the only confirmation
+offered is to ask the agent and trust the prose that comes back.
+
+It does work. Captured on the wire, with the request aborted so no model call
+was spent:
+
+```
+before:  "timezone\":\"America/Los_Angeles\"
+after:   "timezone\":\"Europe/London\"
+```
+
+Three things the page never says, all of which a reader hits immediately:
+
+- **Re-registration is a remove-then-append, not an update.** The entry leaves
+  its position and returns at the *end* of the context list with a new id. The
+  count is unchanged, so a reader watching the top of a context list sees the
+  entry vanish. Verified: position 0 before the click, position 7 after.
+- **Nothing observable happens in the UI**, so the natural conclusion is that
+  the button is broken. This one cost real debugging time here before the wire
+  capture settled it.
+- **There is no reactive way to watch context.** `CopilotKit` exposes signals
+  for `agents`, `runtimeConnectionStatus`, `threadEndpoints`, `intelligence`,
+  `licenseStatus` and `suggestionsByAgent` — but none for context.
+  `core.getContextForAgent()` is public and read-only, and polling it is the
+  only hook available. The harness diagnostics strip polls at 750ms for exactly
+  this reason.
+
+Not a defect in the sample's behaviour — a defect in its testability, which
+rule 3 of `project-context.md` counts the same way.
+
 ---
 
 ## 11. Troubleshooting
@@ -559,6 +595,7 @@ their setup is correct.
 | Production build fails on size | CopilotKit pulls in markdown and syntax-highlighting deps | Already raised in `angular.json`; see Known issues #9. |
 | Peer-dependency error on install | `@angular/cdk` major mismatch | Install the matching major, e.g. `@angular/cdk@^22` on Angular 22. |
 | Thread list empty, drawer shows a lock | No license key | Expected — not a bug. |
+| "Use London time" looks dead — nothing changes | It writes context, not agent state, so no state transition is logged | Expected. Watch the *Registered context* column of the diagnostics strip: the entry moves to the end of the list with the new value. Known issues #18. |
 | Source panels say "Source not generated" | Generated map is stale | `npm run gen:sources` (runs automatically on `npm start` / `npm run build`). |
 | No Inspector launcher on `/inspector/demo` | `@copilotkit/angular` older than 0.4.0, or `enableInspector: false` | Bump to `^0.4.0`; the option lives on `provideCopilotKit` in `src/app/app.config.ts`. |
 | Inspector disappears after navigating | A hand-written `WebInspector` component still in the app | Delete it — its `DestroyRef.onDestroy` removes the element the framework drives. This repo never had one. |

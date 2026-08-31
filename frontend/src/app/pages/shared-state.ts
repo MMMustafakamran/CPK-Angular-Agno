@@ -42,10 +42,15 @@ import { Callout, Panel, SourceCode, TryIt } from '../components/ui';
           </li>
           <li>
             <strong>Context, not state.</strong> Press
-            <strong>Use London time</strong>, then ask
+            <strong>Use London time</strong>. Nothing visible happens on the
+            left — the guide's component renders no value, and context is not
+            agent state, so <strong>no</strong> transition is logged. That is
+            correct, not a dead button: watch the
+            <em>Registered context</em> column instead, where the entry leaves
+            position 0 and reappears at the end of the list carrying
+            <code>Europe/London</code>. Then ask
             <em>what is my username and timezone?</em> — expect <code>Ada</code>
-            and <code>Europe/London</code>, with <strong>no</strong> new
-            transition in the log, because context is not agent state.
+            and <code>Europe/London</code>. See Known issues #18.
           </li>
         </ol>
         <p class="mt-2 text-slate-700">

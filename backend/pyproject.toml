@@ -19,3 +19,10 @@ dependencies = [
     "sqlalchemy[asyncio]>=2.0.52",
     "uvicorn>=0.52.1",
 ]
+
+[tool.uv]
+# Windows Smart App Control blocks the unsigned _ctypes.pyd in uv's own managed
+# CPython builds, so anything importing click (uvicorn) dies at import. Force uv
+# onto the python.org-signed interpreter and never let it fall back to a download.
+python-preference = "only-system"
+python-downloads = "never"

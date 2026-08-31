@@ -20,8 +20,15 @@
  * writes nothing, so mounting it cannot change what the page under test does.
  */
 import { DatePipe } from '@angular/common';
-import { Component, computed, effect, signal } from '@angular/core';
-import { injectAgentStore } from '@copilotkit/angular';
+import {
+  Component,
+  DestroyRef,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
+import { CopilotKit, injectAgentStore } from '@copilotkit/angular';
 
 interface Transition {
   at: Date;
@@ -30,6 +37,11 @@ interface Transition {
   /** True when a run was in flight — i.e. the agent, not the browser, wrote. */
   duringRun: boolean;
   json: string;
+}
+
+interface ContextEntry {
+  description: string;
+  value: string;
 }
 
 const MAX_ROWS = 12;
@@ -57,6 +69,30 @@ const MAX_ROWS = 12;
             and by the agent through <code>STATE_SNAPSHOT</code>. If a button
             press does not appear here, the write never reached the store and no
             answer from the agent can be trusted.
+          </p>
+        </div>
+
+        <div>
+          <h4>Registered context (read-only)</h4>
+          @if (contextEntries().length === 0) {
+            <p class="diag__empty">No context registered for this agent.</p>
+          } @else {
+            <ul class="diag__ctx" data-testid="diag-context">
+              @for (c of contextEntries(); track c.description) {
+                <li>
+                  <span class="diag__keys">{{ c.description }}</span>
+                  <span class="diag__json">{{ c.value }}</span>
+                </li>
+              }
+            </ul>
+          }
+          <p class="diag__note">
+            This is the half the guide gives you no way to see. Pressing
+            <strong>Use London time</strong> writes nothing to agent state, so
+            no transition is logged and the button appears dead — the value
+            changes only here, and on the next run's payload. Polled, because
+            the Angular service exposes signals for agents, threads, licence and
+            suggestions but none for context.
           </p>
         </div>
 
@@ -121,7 +157,7 @@ const MAX_ROWS = 12;
       }
       .diag__grid {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) minmax(0, 1.2fr);
         gap: 1rem;
         padding: 0.75rem 0.85rem;
       }
@@ -148,6 +184,20 @@ const MAX_ROWS = 12;
         color: #8494b3;
         font-size: 0.68rem;
         line-height: 1.5;
+      }
+      .diag__ctx {
+        margin: 0;
+        max-height: 8rem;
+        overflow: auto;
+        padding-left: 1.1rem;
+      }
+      .diag__ctx li {
+        padding: 0.15rem 0;
+      }
+      .diag__ctx .diag__json {
+        display: block;
+        white-space: normal;
+        word-break: break-word;
       }
       .diag__log {
         margin: 0;
@@ -187,6 +237,19 @@ const MAX_ROWS = 12;
 })
 export class SharedStateDiagnosticsComponent {
   private readonly store = injectAgentStore('default');
+  private readonly copilotKit = inject(CopilotKit);
+  private readonly destroyRef = inject(DestroyRef);
+
+  /**
+   * Registered agent context, polled.
+   *
+   * `CopilotKit` exposes signals for agents, runtime status, thread endpoints,
+   * intelligence, licence status and suggestions — but not for context, so
+   * there is no reactive way to observe `connectAgentContext` re-registering.
+   * `core.getContextForAgent` is public and read-only; polling it is the only
+   * hook available, and the need to poll is itself part of the finding.
+   */
+  protected readonly contextEntries = signal<ContextEntry[]>([]);
 
   protected readonly isRunning = computed(() => this.store().isRunning());
   protected readonly stateJson = computed(() =>
@@ -199,6 +262,10 @@ export class SharedStateDiagnosticsComponent {
   private previous: Record<string, unknown> | null = null;
 
   constructor() {
+    const poll = setInterval(() => this.readContext(), 750);
+    this.destroyRef.onDestroy(() => clearInterval(poll));
+    this.readContext();
+
     effect(() => {
       const next = this.store().state() as Record<string, unknown> | undefined;
       const json = JSON.stringify(next ?? null);
@@ -221,6 +288,28 @@ export class SharedStateDiagnosticsComponent {
         ].slice(0, MAX_ROWS),
       );
     });
+  }
+
+  /** Snapshot the registered context, shortest description first. */
+  private readContext(): void {
+    let entries: ContextEntry[] = [];
+    try {
+      entries = (this.copilotKit.core.getContextForAgent('default') ?? []).map(
+        (c) => ({
+          description: String(c.description ?? '(no description)'),
+          value: typeof c.value === 'string' ? c.value : JSON.stringify(c.value),
+        }),
+      );
+    } catch {
+      // A core without the accessor is a finding for the caller, not a crash
+      // for the page under test.
+      entries = [];
+    }
+    if (
+      JSON.stringify(entries) !== JSON.stringify(this.contextEntries())
+    ) {
+      this.contextEntries.set(entries);
+    }
   }
 }
 
