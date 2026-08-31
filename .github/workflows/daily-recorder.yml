@@ -14,8 +14,8 @@ name: Daily Doc Check, Version Watch and Demo Recording
 # -- once per shard, each after two minutes of toolchain install -- and could
 # only express drift as one red shard racing two green ones.
 
-# GitHub allows a workflow_dispatch at most 10 INPUTS. This form uses 9, so
-# there is room for exactly one more. Section checkboxes rather than per-page
+# GitHub allows a workflow_dispatch at most 10 INPUTS. This form now uses all
+# 10 -- the Inspector section claimed the last slot. Section checkboxes rather than per-page
 # ones are what keep it under the cap as pages are added.
 #
 # Sections map to page ids in ci/lib/pages.mjs (PAGE_GROUPS). A page belonging
@@ -55,6 +55,10 @@ on:
         default: false
       group_threads:
         description: 'Threads, Memory, Attachments, Headless'
+        type: boolean
+        default: false
+      group_inspector:
+        description: 'Inspector'
         type: boolean
         default: false
       pages:
@@ -132,6 +136,7 @@ jobs:
           add_group "${{ inputs.group_interaction }}"     interaction
           add_group "${{ inputs.group_shared_state }}"    shared_state
           add_group "${{ inputs.group_threads }}"         threads
+          add_group "${{ inputs.group_inspector }}"       inspector
 
           PAGES="$(node ci/resolve-selection.mjs --pages="${INPUT_PAGES:-}" --groups="$SEL_GROUPS")"
           echo "pages=$PAGES" >> "$GITHUB_OUTPUT"

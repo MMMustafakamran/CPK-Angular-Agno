@@ -37,6 +37,7 @@ export const PAGE_GROUPS = {
   interaction: ['voice-multimodal', 'human-in-the-loop'],
   shared_state: ['shared-state'],
   threads: ['threads', 'memory', 'attachments', 'headless'],
+  inspector: ['inspector'],
 };
 
 export function readPageIds() {
