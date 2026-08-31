@@ -5,12 +5,12 @@ A navigable, working test harness for the Angular section of the CopilotKit Agno
 | | |
 |---|---|
 | **Doc sync date** | 2026-08-12 (docs last fetched live) |
-| **CopilotKit packages** | `@copilotkit/angular` 0.3.1 · `@copilotkit/runtime` 1.67.1 |
+| **CopilotKit packages** | `@copilotkit/angular` 0.4.0 · `@copilotkit/runtime` 1.69.2 |
 | **AG-UI packages** | `@ag-ui/agno` 0.0.5 |
 | **Frontend** | Angular 22.1.1 · TypeScript 6.0 · Tailwind 4 · zoneless |
 | **Runtime** | Node 24.16.0 · Copilot Runtime v2 Node listener on :8200 |
 | **Backend** | Python 3.13.13 · Agno 2.8.7 · FastAPI/AgentOS on :8000 |
-| **Build status** | No CI. Locally verified: `ng build` ✅ · 13 doc routes + 11 demo routes serve 200 ✅ · live agent run with tool call ✅ · human-in-the-loop pause ✅ · shared-state snapshot ✅ · A2UI **not** observed over the wire ⚠️ (see Known issues) |
+| **Build status** | No CI. Locally verified: `ng build` ✅ · 14 doc routes + 12 demo routes serve 200 ✅ · live agent run with tool call ✅ · human-in-the-loop pause ✅ · shared-state snapshot ✅ · A2UI **not** observed over the wire ⚠️ (see Known issues) |
 
 ---
 
@@ -213,6 +213,15 @@ curl -s http://localhost:8200/api/copilotkit/info
 
 It should list `default` and `support` under `agents`.
 
+The CLI check the [CLI page](https://docs.copilotkit.ai/angular/agno/cli) added on 30 Aug, wired to this repo's port:
+
+```bash
+npm run verify              # wiring only
+npm run verify:round-trip   # also runs the agent once — costs a model call
+```
+
+With the runtime up and no license key, the honest result here is **2 passed, 2 failed, 3 could not be checked** — the two failures are the hosted-project and API-key checks, which no unlicensed local setup can pass. See Known issues #12 before treating `verify` as a CI gate.
+
 ---
 
 ## 7. What to expect — walkthrough per section
@@ -273,6 +282,10 @@ These four routes all come from the single `threads-memory-attachments-headless`
 
 **`/headless` — Headless UI.** **Try:** type into the bare textarea and press Send. **Pass:** the message appears in the hand-written transcript, "Agent is working…" shows during the run, and the reply streams — with no CopilotKit chrome anywhere. A conversation started on Quickstart is already visible here. **Fail:** Send does nothing.
 
+### Inspector
+
+**`/inspector` — Inspector.** **Try:** open the demo and look at the bottom-left corner, then open **Agents → Agent** and send a message with **AG-UI Events** open. **Pass:** the badge reads `cpk-web-inspector mounted`, the launcher sits bottom-left (the page's CSS override), the agent is listed, and events move while the reply streams. **Fail:** no launcher, or the badge stays on `no cpk-web-inspector`. Nothing in the demo component mounts the element — that is the claim under test.
+
 **`/status`** — Every route and its status in one table.
 
 ---
@@ -295,6 +308,8 @@ Verified 2026-08-12 against a live stack (real OpenAI key, no license key).
 | `/angular/agno/guides/threads-…-headless` | `/memory` | ⚠️ Partial | Premium; runtime provides no memory routes, so the fallback renders. |
 | `/angular/agno/guides/threads-…-headless` | `/attachments` | ✅ Working | Picker, drag-and-drop, paste. |
 | `/angular/agno/guides/threads-…-headless` | `/headless` | ✅ Working | Shares the `default` conversation with the other demos. |
+| `/angular/agno/inspector` | `/inspector` | ✅ Working | Framework-mounted from `@copilotkit/angular` 0.4.0; `enableInspector` and the launcher CSS applied. Not reproducible on 0.3.1 — see Known issues #12. |
+| `/angular/agno/cli` | — | 🚧 Not started | No route. The new `verify` section is exercised through `npm run verify` instead; findings in Known issues #12. |
 
 **Legend:** ✅ Working · ⚠️ Partial (blocked by something outside this repo) · 📖 Reference · ❌ Broken · 🚧 Not started
 
@@ -456,6 +471,18 @@ The renderer name in `registerRenderToolCall({ name })` must equal the agent's t
 
 `requestApproval` exists only in the browser, and the agent called it normally — verified over the wire, with the run pausing for the browser's response. CopilotKit forwards frontend tools to the agent in the AG-UI run input. The inverse still bites: a tool declared on the agent with **no** frontend handler registered will hang the run forever.
 
+**12. The Inspector page's version floor is stated for the wrong thing**
+
+[Inspector](https://docs.copilotkit.ai/angular/agno/inspector) says `@copilotkit/angular` "did not mount the Inspector before **0.4.0**" only inside the callout about deleting a hand-written mount. Everything else on the page — the automatic mount, `enableInspector`, the "nothing to install" claim — is written unconditionally. On 0.3.1, which is what this repo ran until this route was added, none of it holds: the package does not depend on `@copilotkit/web-inspector`, and `enableInspector` is not a member of `CopilotKitConfig`, so the page's only TypeScript sample does not compile. A reader on 0.3.x follows a page that describes a version they are not on and gets no error message saying so. This repo bumped to `^0.4.0`; the floor belongs at the top of the page.
+
+**13. `verify` cannot gate CI for a project that does not use Intelligence**
+
+The [CLI page](https://docs.copilotkit.ai/angular/agno/cli) says `verify` "exits non-zero unless every check passed, so it is usable as a CI gate". Exit 1 is confirmed. But three of its seven checks are Intelligence checks — hosted project selected, project API key present, key authenticates — and they **FAIL**, not `UNKNOWN`, when the project simply does not use Intelligence. This stack is fully working (runtime answers, two agents declared) and still exits 1. There is no documented flag to scope the run to the wiring checks, so the CI-gate advice does not hold for the majority of local setups, including the one the Angular quickstart produces.
+
+**14. `verify` reports the agent framework as `t`**
+
+The summary block prints `framework  t`. `/api/copilotkit/info` is the source: it reports `"className": "t"` for both agents — a **minified** class name from the runtime bundle, not `AgnoAgent`. The CLI passes it through verbatim, so the field that is supposed to tell you which integration answered is unreadable. Same run reports `generative UI  disabled`, consistent with issue #2.
+
 ---
 
 ## 11. Troubleshooting
@@ -473,6 +500,9 @@ The renderer name in `registerRenderToolCall({ name })` must equal the agent's t
 | Peer-dependency error on install | `@angular/cdk` major mismatch | Install the matching major, e.g. `@angular/cdk@^22` on Angular 22. |
 | Thread list empty, drawer shows a lock | No license key | Expected — not a bug. |
 | Source panels say "Source not generated" | Generated map is stale | `npm run gen:sources` (runs automatically on `npm start` / `npm run build`). |
+| No Inspector launcher on `/inspector/demo` | `@copilotkit/angular` older than 0.4.0, or `enableInspector: false` | Bump to `^0.4.0`; the option lives on `provideCopilotKit` in `src/app/app.config.ts`. |
+| Inspector disappears after navigating | A hand-written `WebInspector` component still in the app | Delete it — its `DestroyRef.onDestroy` removes the element the framework drives. This repo never had one. |
+| `npm run verify` exits 1 on a working stack | Its three Intelligence checks FAIL without a license | Expected here; read the individual checks, not the summary. Known issues #13. |
 | Backend exits immediately | No `OPENAI_API_KEY` | `cp .env.example backend/.env` and fill it in. |
 
 ---

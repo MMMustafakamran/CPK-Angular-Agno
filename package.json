@@ -14,6 +14,8 @@
     "record:doctor:online": "npm --prefix autorecorder run doctor:online",
     "drift": "node ci/check-doc-drift.mjs",
     "drift:sync": "node ci/check-doc-drift.mjs --update",
-    "ci:pages": "node ci/list-pages.mjs"
+    "ci:pages": "node ci/list-pages.mjs",
+    "verify": "npx copilotkit@latest verify --runtime-url http://localhost:8200/api/copilotkit",
+    "verify:round-trip": "npx copilotkit@latest verify --runtime-url http://localhost:8200/api/copilotkit --round-trip"
   }
 }

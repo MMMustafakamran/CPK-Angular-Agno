@@ -54,6 +54,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/demos').then((m) => m.HeadlessDemo),
   },
   {
+    path: 'inspector/demo',
+    loadComponent: () => import('./pages/demos').then((m) => m.InspectorDemo),
+  },
+  {
     path: 'ide',
     loadComponent: () =>
       import('./pages/ide-view.component').then((m) => m.IdeViewComponent),
@@ -91,6 +95,7 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/attachments'),
       },
       { path: 'headless', loadComponent: () => import('./pages/headless') },
+      { path: 'inspector', loadComponent: () => import('./pages/inspector') },
       { path: 'status', loadComponent: () => import('./pages/status') },
       { path: 'doc-sync', loadComponent: () => import('./pages/doc-sync') },
       { path: '**', redirectTo: '' },

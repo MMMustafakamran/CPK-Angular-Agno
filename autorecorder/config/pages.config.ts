@@ -273,4 +273,25 @@ export const PAGES = definePages([
     prompt: 'Tell me a short joke about Angular.',
     waitAfterPromptMs: 4000,
   },
+  {
+    id: 'inspector',
+    name: 'Inspector',
+    videoName: 'Inspector',
+    docPath: 'inspector',
+    route: 'inspector',
+    // The demo component is the point: it mounts nothing. What the page claims
+    // is that the framework does the mounting, so the clip has to show the
+    // launcher appearing over a component that never asks for it.
+    ideFile: 'frontend/src/app/features/inspector/inspector-demo.component.ts',
+    startLine: 26,
+    endLine: 52,
+    // Then the two places the page actually asks you to touch: the provider
+    // option that controls visibility, and the launcher CSS.
+    extraTabs: [
+      { filePath: 'frontend/src/app/app.config.ts', startLine: 51, endLine: 60 },
+      { filePath: 'frontend/src/styles.css', startLine: 338, endLine: 348 },
+    ],
+    prompt: 'Say hello so the AG-UI event stream has something to show.',
+    waitAfterPromptMs: 4000,
+  },
 ]);

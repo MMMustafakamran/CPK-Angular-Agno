@@ -50,6 +50,13 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(),
     provideCopilotKit({
       runtimeUrl: 'http://localhost:8200/api/copilotkit',
+      // The Inspector mounts itself from 0.4.0 on; `enableInspector` is the
+      // only control the page gives you. Left `true` so the launcher is on
+      // screen for the /inspector recording — the doc's own sample is the
+      // opposite, `enableInspector: false` to hide it during development.
+      // Production and server renders drop it regardless of this flag.
+      // https://docs.copilotkit.ai/angular/agno/inspector
+      enableInspector: true,
       a2ui: {
         recovery: { showAfterMs: 2_000, showAfterAttempts: 2 },
       },

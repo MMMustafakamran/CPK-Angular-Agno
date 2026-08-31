@@ -334,3 +334,15 @@ td > code {
   background: #fee2e2;
   color: #991b1b;
 }
+
+/* Inspector "Position the launcher", verbatim.
+   https://docs.copilotkit.ai/angular/agno/inspector */
+cpk-web-inspector {
+  /* The panel is draggable and sets an inline transform. Neutralize it before
+     choosing a corner. */
+  transform: none !important;
+  top: auto !important;
+  bottom: 1rem !important;
+  left: 1rem !important;
+  right: auto !important;
+}

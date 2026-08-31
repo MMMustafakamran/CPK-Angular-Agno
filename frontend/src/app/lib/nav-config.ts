@@ -201,6 +201,22 @@ export const NAV: NavGroup[] = [
     ],
   },
   {
+    title: 'Inspector',
+    routes: [
+      {
+        path: '/inspector',
+        hasDemo: true,
+        title: 'Inspector',
+        docPath: '/angular/agno/inspector',
+        summary:
+          'The framework-mounted Inspector: no install, no hand-written element, visibility through enableInspector, and the launcher repositioned from the global stylesheet.',
+        status: 'working',
+        statusNote:
+          'Live from @copilotkit/angular 0.4.0 onward. The page’s removal advice has nothing to act on here — this harness never hand-mounted the Inspector.',
+      },
+    ],
+  },
+  {
     title: 'Doc Sync',
     routes: [
       {
