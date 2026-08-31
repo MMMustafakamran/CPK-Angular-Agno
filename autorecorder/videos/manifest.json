@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T16:39:56.826Z",
+  "generatedAt": "2026-08-31T07:40:21.840Z",
   "framework": "Agno (Python) + Angular",
   "videoPrefix": "AGNO-angular",
   "clips": {
@@ -9,16 +9,18 @@
       "name": "Quickstart",
       "file": "AGNO-angular-01-Quickstart.webm",
       "sources": [
+        "frontend/VERSIONS.md",
         "frontend/package.json",
         "frontend/src/app/features/quickstart/quickstart-chat.ts",
         "frontend/server.ts",
         "backend/main.py"
       ],
-      "sourceSha": "a587d70ccdf4",
-      "recordedAt": "2026-08-24T16:39:35.971Z",
-      "bytes": 4969392,
-      "sha256": "ac5ebc273718",
-      "status": "current"
+      "sourceSha": "8391d42d388a",
+      "recordedAt": "2026-08-27T09:49:32.726Z",
+      "bytes": 5475277,
+      "sha256": "d5bbfda88289",
+      "status": "stale",
+      "because": "frontend/VERSIONS.md modified after recording (+2 more)"
     },
     "chat-ui": {
       "order": 2,
@@ -30,10 +32,7 @@
         "frontend/src/app/features/chat-ui/custom-assistant-message.component.ts"
       ],
       "sourceSha": "d6639fe60522",
-      "recordedAt": "2026-08-24T16:25:50.780Z",
-      "bytes": 7002808,
-      "sha256": "5f18f9e7e7f3",
-      "status": "current"
+      "status": "missing"
     },
     "frontend-tools-generative-ui": {
       "order": 3,
@@ -45,10 +44,7 @@
         "frontend/src/app/features/tools/weather-card.component.ts"
       ],
       "sourceSha": "830a2c98b26d",
-      "recordedAt": "2026-08-24T16:27:13.830Z",
-      "bytes": 5715519,
-      "sha256": "4c5fb2f2fe7b",
-      "status": "current"
+      "status": "missing"
     },
     "a2ui": {
       "order": 4,
@@ -59,11 +55,12 @@
         "frontend/src/app/features/a2ui/a2ui-chat.component.ts",
         "frontend/server.ts"
       ],
-      "sourceSha": "e2d994ef90f2",
-      "recordedAt": "2026-08-24T16:29:08.176Z",
-      "bytes": 6615433,
-      "sha256": "f3159b3d98f0",
-      "status": "current"
+      "sourceSha": "522c0f0677a9",
+      "recordedAt": "2026-08-28T15:41:35.612Z",
+      "bytes": 9913327,
+      "sha256": "4c497a90c45f",
+      "status": "drifted",
+      "because": "source hash e2d994ef90f2 -> 522c0f0677a9 since last manifest"
     },
     "voice-multimodal": {
       "order": 5,
@@ -74,10 +71,7 @@
         "frontend/src/app/features/media/voice-chat.component.ts"
       ],
       "sourceSha": "2bd750aa6f0a",
-      "recordedAt": "2026-08-24T16:30:53.121Z",
-      "bytes": 5446916,
-      "sha256": "a31ddea5eb7e",
-      "status": "current"
+      "status": "missing"
     },
     "human-in-the-loop": {
       "order": 6,
@@ -89,10 +83,7 @@
         "frontend/src/app/features/hitl/approval-card.component.ts"
       ],
       "sourceSha": "016761310c3c",
-      "recordedAt": "2026-08-24T16:31:57.706Z",
-      "bytes": 3997654,
-      "sha256": "9cce93c0af61",
-      "status": "current"
+      "status": "missing"
     },
     "shared-state": {
       "order": 7,
@@ -104,10 +95,10 @@
         "frontend/src/app/features/shared-state/account-context.component.ts"
       ],
       "sourceSha": "2140eb9af3da",
-      "recordedAt": "2026-08-24T16:32:58.739Z",
-      "bytes": 4247272,
-      "sha256": "f613e47ce997",
-      "status": "current"
+      "recordedAt": "2026-08-28T15:41:38.524Z",
+      "bytes": 5132987,
+      "sha256": "a3ab04c8f36f",
+      "status": "new"
     },
     "threads": {
       "order": 8,
@@ -119,10 +110,10 @@
         "frontend/src/app/features/threads/threads-demo.component.ts"
       ],
       "sourceSha": "df38cc95b7cc",
-      "recordedAt": "2026-08-24T16:34:55.287Z",
-      "bytes": 6182569,
-      "sha256": "1e1222c2f0e7",
-      "status": "current"
+      "recordedAt": "2026-08-28T15:41:40.704Z",
+      "bytes": 7413678,
+      "sha256": "b746f05af100",
+      "status": "new"
     },
     "memory": {
       "order": 9,
@@ -133,10 +124,7 @@
         "frontend/src/app/features/memory/memory-list.component.ts"
       ],
       "sourceSha": "2cb800afef67",
-      "recordedAt": "2026-08-24T16:36:08.304Z",
-      "bytes": 5624805,
-      "sha256": "fe72573e4405",
-      "status": "current"
+      "status": "missing"
     },
     "attachments": {
       "order": 10,
@@ -147,10 +135,7 @@
         "frontend/src/app/features/attachments/media-chat.component.ts"
       ],
       "sourceSha": "ae00ca06086c",
-      "recordedAt": "2026-08-24T16:37:15.372Z",
-      "bytes": 3979603,
-      "sha256": "f5d2a6ada558",
-      "status": "current"
+      "status": "missing"
     },
     "headless": {
       "order": 11,
@@ -161,10 +146,23 @@
         "frontend/src/app/features/headless/headless-chat.component.ts"
       ],
       "sourceSha": "85b0ff48591e",
-      "recordedAt": "2026-08-24T16:38:08.109Z",
-      "bytes": 3253747,
-      "sha256": "05a4d6e13c2c",
-      "status": "current"
+      "status": "missing"
+    },
+    "inspector": {
+      "order": 12,
+      "id": "inspector",
+      "name": "Inspector",
+      "file": "AGNO-angular-12-Inspector.webm",
+      "sources": [
+        "frontend/src/app/features/inspector/inspector-demo.component.ts",
+        "frontend/src/app/app.config.ts",
+        "frontend/src/styles.css"
+      ],
+      "sourceSha": "64ed31322ae2",
+      "recordedAt": "2026-08-31T07:37:50.554Z",
+      "bytes": 5454759,
+      "sha256": "eb831acda509",
+      "status": "new"
     }
   }
 }

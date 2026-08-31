@@ -308,7 +308,7 @@ Verified 2026-08-12 against a live stack (real OpenAI key, no license key).
 | `/angular/agno/guides/threads-…-headless` | `/memory` | ⚠️ Partial | Premium; runtime provides no memory routes, so the fallback renders. |
 | `/angular/agno/guides/threads-…-headless` | `/attachments` | ✅ Working | Picker, drag-and-drop, paste. |
 | `/angular/agno/guides/threads-…-headless` | `/headless` | ✅ Working | Shares the `default` conversation with the other demos. |
-| `/angular/agno/inspector` | `/inspector` | ✅ Working | Framework-mounted from `@copilotkit/angular` 0.4.0; `enableInspector` and the launcher CSS applied. Not reproducible on 0.3.1 — see Known issues #12. |
+| `/angular/agno/inspector` | `/inspector` | ✅ Working | Verified live: element mounts, panel opens, System Health *Healthy*, `RUN_FINISHED` in Recent activity after a real run. Not reproducible on 0.3.1 — Known issues #12; launcher position caveat #15. |
 | `/angular/agno/cli` | — | 🚧 Not started | No route. The new `verify` section is exercised through `npm run verify` instead; findings in Known issues #12. |
 
 **Legend:** ✅ Working · ⚠️ Partial (blocked by something outside this repo) · 📖 Reference · ❌ Broken · 🚧 Not started
@@ -482,6 +482,17 @@ The [CLI page](https://docs.copilotkit.ai/angular/agno/cli) says `verify` "exits
 **14. `verify` reports the agent framework as `t`**
 
 The summary block prints `framework  t`. `/api/copilotkit/info` is the source: it reports `"className": "t"` for both agents — a **minified** class name from the runtime bundle, not `AgnoAgent`. The CLI passes it through verbatim, so the field that is supposed to tell you which integration answered is unreadable. Same run reports `generative UI  disabled`, consistent with issue #2.
+
+**15. The launcher corner the page recommends lands on the composer**
+
+The Inspector page's CSS sample moves the launcher bottom-left because that
+"keeps the launcher clear of the close button on a chat panel or sidebar". On a
+full-height `copilot-chat` — the quickstart's own layout, and this route's — the
+bottom-left corner is where the composer is. Applied verbatim here, the open
+panel sits over the text area: a Playwright click on the composer fails with
+`<cpk-web-inspector> intercepts pointer events` while the panel is open. The
+sample is correct about the docked chat surfaces and wrong about the default
+one, and the page does not say which layout it assumes.
 
 ---
 
