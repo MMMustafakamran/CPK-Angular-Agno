@@ -199,13 +199,31 @@ export const PAGES = definePages([
         startLine: 9,
         endLine: 31,
       },
+      {
+        filePath:
+          'frontend/src/app/features/shared-state/shared-state-diagnostics.component.ts',
+        startLine: 1,
+        endLine: 22,
+      },
     ],
-    // Both halves of the guide in one question: `priority` is agent *state*,
-    // written from the browser; `userName`/`timezone` are read-only *context*.
-    // The earlier "what notes do I have?" was unanswerable -- the notes array is
-    // always empty here, so the agent had nothing to be right about.
+    // A second IDE tab, because the diagnostics strip is the thing that makes
+    // this clip diagnosable and it is not the guide's code.
+    // Four turns, not one. `prompts` is read in phase order by
+    // actions/shared-state.action.ts: baseline before any write, then after
+    // priority=high, then after priority=low, then the read-only context.
+    // Asking the same question across two different written values is what
+    // separates a real read of agent state from a word echoed out of the
+    // question -- the old single "high" turn could not tell those apart.
+    // `prompt` mirrors prompts[0], the convention the doctor enforces: the
+    // single-prompt field is always the first turn, never a different one.
     prompt:
+      'Before I change anything: what priority is my workspace currently set to?',
+    prompts: [
+      'Before I change anything: what priority is my workspace currently set to?',
+      'I just changed it. What priority is my workspace set to now?',
+      'I changed it again. What is the priority now?',
       'What is my username and timezone, and what priority is my workspace set to?',
+    ],
     waitAfterPromptMs: 4000,
   },
   {

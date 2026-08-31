@@ -12,20 +12,52 @@ import { Callout, Panel, SourceCode, TryIt } from '../components/ui';
     <div class="space-y-6">
       <ui-try-it>
         <p class="mt-1 text-slate-700">
-          Open the demo. Press <strong>Mark high priority</strong>, then ask the
-          agent the following questions 
-          <br> <em>What is my current priority and what notes do I have?</em> 
-          <br> <em>What is my name? </em> -> It should respond <b>Ada</b>
-          <br> <em>What is my timezone? </em> -> It should respond <b> America/Los_Angeles._</b> 
-          <br> Then press <strong>Use London time</strong> and ask
-          <em>What timezone am I in, and which record am I looking at?</em>
+          Open the demo and work down the panel at the bottom — it logs every
+          <code>store().state()</code> transition, so each write can be seen
+          landing <em>before</em> the agent is asked about it.
         </p>
+        <ol
+          class="mt-2 list-decimal space-y-1 pl-5 text-sm text-slate-700"
+        >
+          <li>
+            <strong>Baseline.</strong> Before touching anything, ask
+            <em>what priority is my workspace currently set to?</em>. The panel
+            shows the agent's real state is <code>&#123;&#125;</code> — the guide's
+            <code>EMPTY_STATE</code> is a render-time fallback that was never
+            sent to the agent. A confident <code>normal</code> here is the model
+            reading the left-hand panel's text, not agent state. See Known
+            issues #16.
+          </li>
+          <li>
+            <strong>Write high.</strong> Press <strong>Mark high priority</strong>.
+            A <code>browser</code> transition appears naming
+            <code>priority</code>, and the state becomes
+            <code>&#123; "priority": "high" &#125;</code> — note that
+            <code>notes</code> is absent, not empty. Ask again — expect
+            <code>high</code>.
+          </li>
+          <li>
+            <strong>Write low.</strong> Press <strong>Mark low priority</strong>
+            and ask again — expect <code>low</code>.
+          </li>
+          <li>
+            <strong>Context, not state.</strong> Press
+            <strong>Use London time</strong>, then ask
+            <em>what is my username and timezone?</em> — expect <code>Ada</code>
+            and <code>Europe/London</code>, with <strong>no</strong> new
+            transition in the log, because context is not agent state.
+          </li>
+        </ol>
         <p class="mt-2 text-slate-700">
-          <strong>Pass:</strong> the agent reports <code>high</code>, then
-          reports <code>Europe/London</code> and <code>record-42</code>. Ask it
-          to add a note and the list on the left updates.
-          <strong>Fail:</strong> the agent has no idea what you're referring
-          to.
+          <strong>Pass:</strong> all four. Step 1 matters most — an agent that
+          answers <code>high</code> before any write is echoing the question,
+          and every later step is then meaningless.
+          <strong>Fail, and where to look:</strong> no transition logged after a
+          button press means the browser write never reached the store; a
+          transition logged but the agent still answering the old value means
+          the write never reached the agent; a wrong timezone with a correct
+          priority isolates the fault to the read-only context accessor rather
+          than to state.
         </p>
       </ui-try-it>
 

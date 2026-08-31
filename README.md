@@ -303,7 +303,7 @@ Verified 2026-08-12 against a live stack (real OpenAI key, no license key).
 | `/angular/agno/guides/a2ui` | `/a2ui` | ⚠️ Partial | Inert without a frontend catalog — that, not the runtime middleware, is the switch. See Known issues #2. |
 | `/angular/agno/guides/voice-multimodal` | `/voice-multimodal` | ⚠️ Partial | Attachments work. Transcription unavailable by design — `audioFileTranscriptionEnabled: false`. |
 | `/angular/agno/guides/human-in-the-loop` | `/human-in-the-loop` | ✅ Working | Verified: `requestApproval` emitted with **no** tool result, run pauses awaiting the browser. Interrupt half idle — agent emits none. |
-| `/angular/agno/guides/shared-state` | `/shared-state` | ✅ Working | Verified: `STATE_SNAPSHOT` carries `{"notes":[],"priority":"normal"}`. |
+| `/angular/agno/guides/shared-state` | `/shared-state` | ✅ Working | Round-trip verified across two written values, with a harness-only diagnostics strip logging every `store().state()` transition. Agent state starts `{}` and loses `notes` on first write — Known issues #16. |
 | `/angular/agno/guides/threads-…-headless` | `/threads` | ⚠️ Partial | Premium. `/info` reports `threadEndpoints.mutations: false`. |
 | `/angular/agno/guides/threads-…-headless` | `/memory` | ⚠️ Partial | Premium; runtime provides no memory routes, so the fallback renders. |
 | `/angular/agno/guides/threads-…-headless` | `/attachments` | ✅ Working | Picker, drag-and-drop, paste. |
@@ -493,6 +493,32 @@ panel sits over the text area: a Playwright click on the composer fails with
 `<cpk-web-inspector> intercepts pointer events` while the panel is open. The
 sample is correct about the docked chat surfaces and wrong about the default
 one, and the page does not say which layout it assumes.
+
+**16. The Shared state guide never initialises agent state, and its own fallback hides it**
+
+[Shared state](https://docs.copilotkit.ai/angular/agno/guides/shared-state)
+opens with a read sample whose `EMPTY_STATE` const implies the agent starts at
+`{ notes: [], priority: "normal" }`. It does not. The diagnostics strip on
+`/shared-state/demo` reports the agent's real state as `{}` until the browser
+writes to it, and the page renders `Priority: normal` anyway because
+`EMPTY_STATE` is applied at render time and never sent anywhere. So an agent
+asked about priority before any write has nothing in state to read, while the
+UI insists a value exists. The guide never says to seed the state, and the
+sample reads as if it had.
+
+Two consequences the page does not mention:
+
+- **`notes` silently disappears on the first write.** The guide's own
+  `setPriority` does `agent.state ?? EMPTY_STATE`, but `agent.state` is `{}` —
+  present, so the `??` never fires. The spread produces `{ priority }` with no
+  `notes` key at all. Verified: after pressing the button the state is
+  `{"priority":"high"}`, and the notes list is then iterating over a key that
+  no longer exists. `??` is the wrong operator here for a value the runtime
+  initialises to an empty object.
+- **A "correct" answer can be read off the screen instead of the state.** The
+  left panel prints the priority as text, so a model can answer the question
+  from context alone. This is why the recorder now asks a baseline question
+  before any write and then asks across two different written values.
 
 ---
 

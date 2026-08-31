@@ -21,6 +21,7 @@ import { MemoryDemoComponent } from '../features/memory/memory-demo.component';
 import { VoiceChatComponent } from '../features/media/voice-chat.component';
 import { QuickstartChat } from '../features/quickstart/quickstart-chat';
 import { SharedStateChatComponent } from '../features/shared-state/shared-state-chat.component';
+import { SharedStateDiagnosticsComponent } from '../features/shared-state/shared-state-diagnostics.component';
 import { ThreadsDemoComponent } from '../features/threads/threads-demo.component';
 import { ToolsChatComponent } from '../features/tools/tools-chat.component';
 
@@ -76,12 +77,23 @@ export class VoiceDemo {}
 })
 export class HitlDemo {}
 
+/**
+ * The only demo that mounts something the guide does not describe. The
+ * diagnostics strip is harness-only and read-only; it is mounted here rather
+ * than inside `app-shared-state-chat` so every guide-derived component on this
+ * route stays exactly as the doc publishes it.
+ */
 @Component({
   selector: 'app-shared-state-demo',
-  imports: [DemoFrame, SharedStateChatComponent],
-  template: `<app-demo-frame backTo="/shared-state"
-    ><app-shared-state-chat
-  /></app-demo-frame>`,
+  imports: [DemoFrame, SharedStateChatComponent, SharedStateDiagnosticsComponent],
+  template: `<app-demo-frame backTo="/shared-state">
+    <div style="display: flex; flex-direction: column; height: 100%">
+      <div style="flex: 1; min-height: 0">
+        <app-shared-state-chat />
+      </div>
+      <app-shared-state-diagnostics />
+    </div>
+  </app-demo-frame>`,
 })
 export class SharedStateDemo {}
 
