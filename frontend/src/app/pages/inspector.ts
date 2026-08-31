@@ -12,17 +12,28 @@ import { Callout, Panel, SourceCode, TryIt } from '../components/ui';
     <div class="space-y-6">
       <ui-try-it>
         <p class="mt-1 text-slate-700">
-          Open the demo. Look at the corner of the viewport for the Inspector
-          launcher, then open <strong>Agents → Agent</strong> and send a message
-          with <strong>Agents → AG-UI Events</strong> open.
+          Open the demo. Look at the bottom-left corner for the Inspector
+          launcher, click it, then walk the quickstart's confirm-setup step:
+          open <strong>Agent</strong>, pick <code>default</code> in the sidebar
+          agent selector, then open <strong>AG-UI Events</strong> and send a
+          message.
         </p>
         <p class="mt-2 text-slate-700">
           <strong>Pass:</strong> the badge at the top of the demo reads
           <code>cpk-web-inspector mounted</code>, the launcher is in the
           bottom-left corner (the page's CSS override, applied in
-          <code>src/styles.css</code>), the agent is listed, and events move
-          while a message streams. <strong>Fail:</strong> no launcher, or the
-          badge stays on <code>no cpk-web-inspector</code>.
+          <code>src/styles.css</code>), the Agent panel shows
+          <code>default</code> once selected, and AG-UI events move while a
+          message streams. <strong>Fail:</strong> no launcher, or the badge
+          stays on <code>no cpk-web-inspector</code>.
+        </p>
+        <p class="mt-2 text-slate-700">
+          Note the extra step. The quickstart says
+          <em>"Open Agents, then Agent. Your agent is listed"</em>, but the
+          panel opens on <code>No agent selected</code> — the agent appears only
+          after picking it from the sidebar selector, which the step does not
+          mention. The recorder performs both halves and logs each state. See
+          Known issues #17.
         </p>
       </ui-try-it>
 

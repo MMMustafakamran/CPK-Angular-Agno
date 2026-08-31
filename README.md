@@ -508,17 +508,40 @@ sample reads as if it had.
 
 Two consequences the page does not mention:
 
-- **`notes` silently disappears on the first write.** The guide's own
-  `setPriority` does `agent.state ?? EMPTY_STATE`, but `agent.state` is `{}` —
-  present, so the `??` never fires. The spread produces `{ priority }` with no
-  `notes` key at all. Verified: after pressing the button the state is
-  `{"priority":"high"}`, and the notes list is then iterating over a key that
-  no longer exists. `??` is the wrong operator here for a value the runtime
-  initialises to an empty object.
+- **`notes` disappears when the first write precedes the first run.** The
+  guide's `setPriority` does `agent.state ?? EMPTY_STATE`, but on a fresh page
+  `agent.state` is `{}` — present, so the `??` never fires and the spread
+  yields `{ priority }` with no `notes` key. Verified locally: press a priority
+  button before sending any message and the state becomes
+  `{"priority":"high"}`, after which the notes list iterates a key that is gone.
+
+  It does **not** reproduce once the agent has run at least once: CI drives a
+  baseline question first, the agent emits a state snapshot carrying `notes`,
+  and every later write then preserves it —
+  `{ "notes": [], "priority": "high" }`. So the bug is ordering-dependent, which
+  is worse than a consistent one: the guide's sample works in the order its own
+  prose implies and breaks in the order its UI invites, and nothing on the page
+  says a run has to happen first. `??` is the wrong operator for a value the
+  runtime initialises to an empty object.
 - **A "correct" answer can be read off the screen instead of the state.** The
   left panel prints the priority as text, so a model can answer the question
   from context alone. This is why the recorder now asks a baseline question
   before any write and then asks across two different written values.
+
+**17. "Open Agents, then Agent. Your agent is listed" — it is not, yet**
+
+The [quickstart](https://docs.copilotkit.ai/angular/agno/quickstart)'s
+confirm-setup step reads: *"Open **Agents**, then **Agent**. Your agent is
+listed."* Opening that panel renders **"No agent selected — Select an agent
+from …"**. Nothing is listed until an agent is picked from a separate sidebar
+control (`[data-inspector-sidebar-agent-selector]`), which the step never
+mentions. Verified by recording both states: on arrival the panel says
+`No agent selected`; after choosing `default` it says
+`default Idle Last activity: …`.
+
+The step is one interaction short of what it describes, and a reader following
+it literally sees an empty panel at exactly the moment the page is telling them
+their setup is correct.
 
 ---
 
