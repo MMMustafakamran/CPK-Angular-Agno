@@ -12,7 +12,7 @@ Cloud-hosted CopilotKit Intelligence is the CopilotKit-operated deployment of th
   body="Sign up or sign in, finish organization onboarding, then return to the CLI or hosted app to select a project."
   ctaLabel="Start managed onboarding"
   href="https://dashboard.operations.copilotkit.ai/"
-  surface="docs_premium_managed_intelligence_platform_intro"
+  surface="docs_intelligence_managed_platform_intro"
 />
 
 ## What the cloud-hosted version provides
@@ -21,7 +21,7 @@ The cloud-hosted version runs CopilotKit Intelligence for you. Your application 
 
 The hosted web app is the control surface for developers and administrators. End users of your application do not sign in to this dashboard. Your app still controls end-user identity and passes user context through the runtime, while the hosted service scopes stored threads to the project your app is connected to.
 
-Use cloud-hosted CopilotKit Intelligence when you want the fastest path to production. Use [Self-host CopilotKit Intelligence](/angular/agno/premium/self-hosting) when your organization needs the platform inside its own VPC, cluster, or data boundary.
+Use cloud-hosted CopilotKit Intelligence when you want the fastest path to production. Use [Self-host CopilotKit Intelligence](/angular/agno/intelligence/self-hosting) when your organization needs the platform inside its own VPC, cluster, or data boundary.
 
 ## Hosted onboarding
 
@@ -70,7 +70,11 @@ Inside a project, the web app shows the conversation history connected to that p
 
 ## API keys
 
-Project API keys connect your runtime to the cloud-hosted project. The CLI provisions a project-scoped key during `create` and `project select`, writes it to `.env` as `INTELLIGENCE_API_KEY`, and records the selected project in `.copilotkit/project.json`.
+Project API keys connect your runtime to the cloud-hosted project. During `init` or its `create` alias, and during `project select`, the CLI provisions a project-scoped key, writes it to `.env` as `CPK_INTELLIGENCE_API_KEY`, and records the selected project in `.copilotkit/project.json`.
+
+Managed project setup does not issue `COPILOTKIT_LICENSE_TOKEN`. That token is only for offline or self-hosted licensing and does not replace the managed project API key.
+
+Managed starters read the project key from `CPK_INTELLIGENCE_API_KEY`. Keep it on the server.
 
 ![The cloud-hosted CopilotKit Intelligence API keys page.](/angular/agno/images/enterprise-intelligence/managed-api-keys.png)
 
@@ -122,5 +126,5 @@ in a customer-run deployment.
 - **Explore Rich Threads:** [Rich Threads overview](/angular/agno/guides/threads-memory-attachments-headless) — understand persistent, resumable conversations and choose an implementation path
 - **Use the CLI:** [CopilotKit CLI](/angular/agno/cli) — sign in, scaffold apps, select cloud-hosted projects, and write project configuration
 - **Add threads:** [Headless Threads](/angular/agno/guides/threads-memory-attachments-headless) — list, create, rename, archive, and delete persistent conversations in a custom UI
-- **Thread architecture:** [Threads & Persistence Architecture](/angular/agno/premium/threads-explained) — event replay, realtime sync, and thread lifecycle semantics
-- **Self-host the platform:** [Self-host CopilotKit Intelligence](/angular/agno/premium/self-hosting) — install and operate the Helm chart in your own cluster
+- **Thread architecture:** [Threads & Persistence Architecture](/angular/agno/intelligence/threads-explained) — event replay, realtime sync, and thread lifecycle semantics
+- **Self-host the platform:** [Self-host CopilotKit Intelligence](/angular/agno/intelligence/self-hosting) — install and operate the Helm chart in your own cluster

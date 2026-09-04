@@ -8,8 +8,8 @@ runtime as `intelligence`. The runtime reads the key from the client you pass,
 not from the environment.
 
 This page is that wiring step. For what the platform is and why you would use it,
-see the [CopilotKit Intelligence overview](/angular/agno/premium/overview) and the
-[architecture page](/angular/agno/premium/intelligence-platform).
+see the [CopilotKit Intelligence overview](/angular/agno/intelligence/overview) and the
+[architecture page](/angular/agno/intelligence/intelligence-platform).
 
 ## Before you start
 
@@ -20,12 +20,12 @@ npx copilotkit login
 npx copilotkit project select
 ```
 
-`project select` writes a project-scoped key to `.env` as `INTELLIGENCE_API_KEY`.
+`project select` writes a project-scoped key to `.env` as `CPK_INTELLIGENCE_API_KEY`.
 You can also copy a key from the
-[cloud-hosted dashboard](/angular/agno/premium/managed-intelligence-platform).
+[cloud-hosted dashboard](/angular/agno/intelligence/managed-intelligence-platform).
 
 ```bash title=".env"
-INTELLIGENCE_API_KEY=cpk-...
+CPK_INTELLIGENCE_API_KEY=cpk-...
 ```
 
 <Callout type="warn">
@@ -46,7 +46,7 @@ import {
 
 const intelligence = new CopilotKitIntelligence({
   // apiUrl and wsUrl default to the managed platform — leave them unset.
-  apiKey: process.env.INTELLIGENCE_API_KEY!,
+  apiKey: process.env.CPK_INTELLIGENCE_API_KEY!,
 });
 
 const runtime = new CopilotRuntime({
@@ -72,7 +72,7 @@ Intelligence — a runtime in SSE mode does all of that with the key unread. So 
 green round trip in the browser is not evidence on its own.
 
 Confirm it from the product side instead. Open your project in the
-[cloud-hosted dashboard](/angular/agno/premium/managed-intelligence-platform) and send a
+[cloud-hosted dashboard](/angular/agno/intelligence/managed-intelligence-platform) and send a
 message in your app. A thread should appear. If none does, the runtime never
 reached the platform and is running in SSE mode, whatever the browser showed.
 
@@ -87,7 +87,7 @@ leaves the other plane pointed at the managed host.
 const intelligence = new CopilotKitIntelligence({
   apiUrl: "https://api.intelligence.internal",
   wsUrl: "wss://realtime.intelligence.internal",
-  apiKey: process.env.INTELLIGENCE_API_KEY!,
+  apiKey: process.env.CPK_INTELLIGENCE_API_KEY!,
 });
 ```
 
@@ -95,7 +95,7 @@ Pass the bare websocket base: the client appends `/runner` and `/client` itself,
 and prepends `/api` to every REST call. Passing `apiUrl: ".../api"` produces
 double-prefixed `/api/api/threads`.
 
-See [Self-host CopilotKit Intelligence](/angular/agno/premium/self-hosting) for the full
+See [Self-host CopilotKit Intelligence](/angular/agno/intelligence/self-hosting) for the full
 deployment path.
 
 ## Troubleshooting
@@ -103,6 +103,6 @@ deployment path.
 | Symptom | Cause |
 | --- | --- |
 | Chat works, no threads in the dashboard | `intelligence` was never passed to `CopilotRuntime`; the runtime is in SSE mode. |
-| Opaque auth error on the first request | `INTELLIGENCE_API_KEY` is empty or belongs to a different project. |
+| Opaque auth error on the first request | `CPK_INTELLIGENCE_API_KEY` is empty or belongs to a different project. |
 | Socket sits in `connecting`, then "did not settle in time" | `wsUrl` overridden alone, or pointed at the API host. |
 | `/api/api/...` in request logs | `apiUrl` included a `/api` suffix. |

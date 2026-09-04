@@ -2,9 +2,9 @@
 
 > CopilotKit Intelligence architecture — how CopilotKit runtimes connect to platform projects, durable threads, realtime sync, operational history, and cloud-hosted or self-hosted deployments.
 
-CopilotKit Intelligence is the platform backend behind production CopilotKit capabilities such as durable threads, realtime sync, project-scoped history, the hosted web app, and operational visibility. This page explains the mental model that applies to both [Cloud-hosted CopilotKit Intelligence](/angular/agno/premium/managed-intelligence-platform) and [Self-host CopilotKit Intelligence](/angular/agno/premium/self-hosting).
+CopilotKit Intelligence is the platform backend behind production CopilotKit capabilities such as durable threads, realtime sync, project-scoped history, the hosted web app, and operational visibility. This page explains the mental model that applies to both [Cloud-hosted CopilotKit Intelligence](/angular/agno/intelligence/managed-intelligence-platform) and [Self-host CopilotKit Intelligence](/angular/agno/intelligence/self-hosting).
 
-For a product-level map of features and hosting options, start with the [CopilotKit Intelligence overview](/angular/agno/premium/overview). To wire an existing runtime to the platform, see [Connect your runtime to Intelligence](/angular/agno/premium/connect-your-runtime). For Kubernetes installation, go straight to [Self-host CopilotKit Intelligence](/angular/agno/premium/self-hosting).
+For a product-level map of features and hosting options, start with the [CopilotKit Intelligence overview](/angular/agno/intelligence/overview). To wire an existing runtime to the platform, see [Connect your runtime to Intelligence](/angular/agno/intelligence/connect-your-runtime). For Kubernetes installation, go straight to [Self-host CopilotKit Intelligence](/angular/agno/intelligence/self-hosting).
 
 <OpsPlatformCTA
   variant="inline"
@@ -12,7 +12,7 @@ For a product-level map of features and hosting options, start with the [Copilot
   body="Create a hosted project, get a project API key, and inspect persistent threads before deciding whether self-hosting is required."
   ctaLabel="Start managed onboarding"
   href="https://dashboard.operations.copilotkit.ai/"
-  surface="docs_premium_intelligence_architecture_intro"
+  surface="docs_intelligence_architecture_intro"
 />
 
 ## Runtime and platform roles
@@ -41,7 +41,7 @@ Threads are stored as durable platform records. When your UI uses its thread-man
 
 The platform stores event history so a conversation can be replayed after reloads and resumed across devices. That is what separates platform-backed threads from an in-memory chat transcript.
 
-For the thread lifecycle itself, see [Threads & Persistence Architecture](/angular/agno/premium/threads-explained).
+For the thread lifecycle itself, see [Threads & Persistence Architecture](/angular/agno/intelligence/threads-explained).
 
 ## Realtime sync
 
@@ -53,7 +53,7 @@ The important application-level contract is simple: your app uses the same front
 
 The platform also gives teams operational visibility into agent behavior. The cloud-hosted web app exposes project history, thread detail pages, event timelines, API key management, and plan management.
 
-For the cloud-hosted dashboard flow, see [Cloud-hosted CopilotKit Intelligence](/angular/agno/premium/managed-intelligence-platform).
+For the cloud-hosted dashboard flow, see [Cloud-hosted CopilotKit Intelligence](/angular/agno/intelligence/managed-intelligence-platform).
 
 ## Hosting model
 
@@ -79,7 +79,7 @@ Common debugging checks:
 
 ## Next steps
 
-- **Platform overview:** [CopilotKit Intelligence](/angular/agno/premium/overview) — features, hosting options, and where to go next
-- **Cloud-hosted guide:** [Cloud-hosted CopilotKit Intelligence](/angular/agno/premium/managed-intelligence-platform) — login, projects, API keys, threads, and plan management
-- **Self-hosted guide:** [Self-host CopilotKit Intelligence](/angular/agno/premium/self-hosting) — install and operate the platform in Kubernetes
-- **Thread architecture:** [Threads & Persistence Architecture](/angular/agno/premium/threads-explained) — event replay, realtime sync, and thread lifecycle semantics
+- **Platform overview:** [CopilotKit Intelligence](/angular/agno/intelligence/overview) — features, hosting options, and where to go next
+- **Cloud-hosted guide:** [Cloud-hosted CopilotKit Intelligence](/angular/agno/intelligence/managed-intelligence-platform) — login, projects, API keys, threads, and plan management
+- **Self-hosted guide:** [Self-host CopilotKit Intelligence](/angular/agno/intelligence/self-hosting) — install and operate the platform in Kubernetes
+- **Thread architecture:** [Threads & Persistence Architecture](/angular/agno/intelligence/threads-explained) — event replay, realtime sync, and thread lifecycle semantics

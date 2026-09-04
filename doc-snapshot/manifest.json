@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "docsRoot": "https://docs.copilotkit.ai/angular/agno",
-  "syncedAt": "2026-09-04T07:57:42.775Z",
+  "syncedAt": "2026-09-04T08:37:28.094Z",
   "pages": {
     "/angular/agno": {
       "file": "angular__agno.md",
@@ -164,8 +164,8 @@
       "age": 0,
       "date": "Sun, 30 Aug 2026 13:42:59 GMT"
     },
-    "/angular/agno/premium/threads-explained": {
-      "file": "angular__agno__premium__threads-explained.md",
+    "/angular/agno/intelligence/threads-explained": {
+      "file": "angular__agno__intelligence__threads-explained.md",
       "sha256": "012a845203c85d2478347febaaeed4dc12b9d4d55925882d577364977748fa1f",
       "bytes": 10506,
       "lines": 160,
@@ -184,55 +184,55 @@
       "age": 0,
       "date": "Sun, 30 Aug 2026 13:42:59 GMT"
     },
-    "/angular/agno/premium/overview": {
-      "file": "angular__agno__premium__overview.md",
-      "sha256": "8e1f0b6ca3524e71423d998da70f017fc9cfeb8b0e6047d4e8dc65f700463109",
-      "bytes": 5286,
-      "lines": 76,
+    "/angular/agno/intelligence/overview": {
+      "file": "angular__agno__intelligence__overview.md",
+      "sha256": "d7c15f534f919e5af3ccbbe90cf084cde25e13a9d8cbdf9d3429bfc6ce0bce00",
+      "bytes": 5505,
+      "lines": 78,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Sun, 30 Aug 2026 13:42:59 GMT"
+      "date": "Fri, 04 Sep 2026 08:37:28 GMT"
     },
-    "/angular/agno/premium/managed-intelligence-platform": {
-      "file": "angular__agno__premium__managed-intelligence-platform.md",
-      "sha256": "125c2f4a519f8009953c208520830b6a73ab6db35d1b512d3b0e15cb466982f8",
-      "bytes": 8356,
-      "lines": 127,
+    "/angular/agno/intelligence/managed-intelligence-platform": {
+      "file": "angular__agno__intelligence__managed-intelligence-platform.md",
+      "sha256": "d850caf69541e24489c429c595f7481d385e452449277dca3f9d96badbfeab7e",
+      "bytes": 8663,
+      "lines": 131,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Sun, 30 Aug 2026 13:42:59 GMT"
+      "date": "Fri, 04 Sep 2026 08:37:28 GMT"
     },
-    "/angular/agno/premium/connect-your-runtime": {
-      "file": "angular__agno__premium__connect-your-runtime.md",
-      "sha256": "24f0a377eae539a48e72fc4daa7369af794f8257ef266feda00316745f222f8d",
-      "bytes": 4115,
+    "/angular/agno/intelligence/connect-your-runtime": {
+      "file": "angular__agno__intelligence__connect-your-runtime.md",
+      "sha256": "39209b58c869048140aee40e4ffbbb089221c8cb46f655b750aa5b2bf7982f9e",
+      "bytes": 4160,
       "lines": 109,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Sun, 30 Aug 2026 13:42:59 GMT"
+      "date": "Fri, 04 Sep 2026 08:37:28 GMT"
     },
-    "/angular/agno/premium/self-hosting": {
-      "file": "angular__agno__premium__self-hosting.md",
-      "sha256": "d6f25bc164345c84b6bb26f4da6366549040595c1d1a53bb99f117f166249902",
-      "bytes": 31136,
-      "lines": 572,
+    "/angular/agno/intelligence/self-hosting": {
+      "file": "angular__agno__intelligence__self-hosting.md",
+      "sha256": "37e0d95583bbe85d931e983d74a17433527123f394dc8a625f76efff68b2a8f3",
+      "bytes": 40895,
+      "lines": 581,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Sun, 30 Aug 2026 13:42:59 GMT"
+      "date": "Fri, 04 Sep 2026 08:37:28 GMT"
     },
-    "/angular/agno/premium/intelligence-platform": {
-      "file": "angular__agno__premium__intelligence-platform.md",
-      "sha256": "bcf57082a33e686f2f07662ea481b4ee2991361df8e8115162fa3dd66661e21f",
-      "bytes": 6116,
+    "/angular/agno/intelligence/intelligence-platform": {
+      "file": "angular__agno__intelligence__intelligence-platform.md",
+      "sha256": "3bebac3ac876f95e208fe40f67eb41198e2a5477518013e4eb027323860e72fd",
+      "bytes": 6163,
       "lines": 86,
       "routes": [],
       "status": "ok",
       "age": 0,
-      "date": "Sun, 30 Aug 2026 13:42:59 GMT"
+      "date": "Fri, 04 Sep 2026 08:37:28 GMT"
     },
     "/angular/agno/copilot-runtime": {
       "file": "angular__agno__copilot-runtime.md",
