@@ -30,7 +30,7 @@ import { type Page } from 'playwright';
 
 import { sendPrompt, waitForAgentResponseCompletion } from '../core/actions';
 import { humanClick, humanGlide, sleep } from '../core/overlays/cursor';
-import { type PageActionHandler, type PageRecordConfig } from '../core/types';
+import { type ActionContext, type PageActionHandler, type PageRecordConfig } from '../core/types';
 
 /** Read the diagnostics panel's live state JSON, for the run log. */
 async function readDiagState(page: Page): Promise<string> {
@@ -52,6 +52,7 @@ async function countTransitions(page: Page): Promise<number> {
 
 /** Click a button the way a person would, and say so if it is missing. */
 async function pressButton(
+  ctx: ActionContext,
   page: Page,
   selector: string,
   label: string,
@@ -59,7 +60,7 @@ async function pressButton(
   const button = page.locator(selector).first();
   const box = await button.boundingBox().catch(() => null);
   if (!box) {
-    console.warn(`   ⚠️ "${label}" not found — skipping this phase.`);
+    ctx.warn(`"${label}" not found -- that phase of the shared-state demo was skipped.`);
     return false;
   }
   await humanGlide(page, box.x + box.width / 2, box.y + box.height / 2, 20);
@@ -101,6 +102,8 @@ async function ask(
 export const runSharedStateAction: PageActionHandler = async (
   page: Page,
   config: PageRecordConfig,
+  _rootPath,
+  ctx,
 ) => {
   const waitMs = config.waitAfterPromptMs ?? 4000;
   const [baselineQ, highQ, lowQ, contextQ] = promptSet(config);
@@ -114,8 +117,7 @@ export const runSharedStateAction: PageActionHandler = async (
   // ── 2. Browser writes high ───────────────────────────────────────────────
   console.log(`   🔄 [2/4] Writing priority=high from the browser...`);
   const beforeHigh = await countTransitions(page);
-  const pressedHigh = await pressButton(
-    page,
+  const pressedHigh = await pressButton(ctx, page,
     'app-workspace button:has-text("Mark high priority")',
     'Mark high priority',
   );
@@ -134,8 +136,7 @@ export const runSharedStateAction: PageActionHandler = async (
   // The second value is what makes this a read rather than a coincidence.
   console.log(`   🔄 [3/4] Writing priority=low from the browser...`);
   const beforeLow = await countTransitions(page);
-  const pressedLow = await pressButton(
-    page,
+  const pressedLow = await pressButton(ctx, page,
     'app-workspace button:has-text("Mark low priority")',
     'Mark low priority',
   );
@@ -154,8 +155,7 @@ export const runSharedStateAction: PageActionHandler = async (
   // A different mechanism from the three above: the accessor re-registers when
   // its signal changes, and nothing is written to agent state at all.
   console.log(`   🌍 [4/4] Switching the account timezone to Europe/London...`);
-  await pressButton(
-    page,
+  await pressButton(ctx, page,
     'app-account-context button:has-text("Use London time")',
     'Use London time',
   );

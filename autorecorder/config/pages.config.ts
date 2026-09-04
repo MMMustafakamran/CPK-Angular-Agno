@@ -73,7 +73,7 @@ export const PAGES = definePages([
       { filePath: 'frontend/server.ts', startLine: 16, endLine: 38 },
       { filePath: 'backend/main.py', startLine: 35, endLine: 49 },
     ],
-    prompt: 'Can you tell me a joke?',
+    prompt: 'Hey, are you connected? Tell me a quick fun fact about kites.',
     waitAfterPromptMs: 4000,
   },
   {
@@ -97,10 +97,10 @@ export const PAGES = definePages([
     ],
     // Four surfaces, driven in order by the handler: inline, custom assistant
     // message, popup, sidebar. Only the first two take a prompt.
-    prompt: 'What is CopilotKit?',
+    prompt: 'In two sentences, what does CopilotKit do?',
     prompts: [
-      'What is CopilotKit?',
-      'Tell me what makes your custom assistant layout unique.',
+      'In two sentences, what does CopilotKit do?',
+      'Nice layout. What is different about how you are rendered here?',
     ],
     waitAfterPromptMs: 4000,
   },
@@ -136,11 +136,11 @@ export const PAGES = definePages([
     // whose result is the page itself repainting, and the new display-only
     // registration — which draws the right card and then makes the agent
     // apologise for it.
-    prompt: "What's the weather in Tokyo?",
+    prompt: 'Check the weather in Tokyo for me.',
     prompts: [
-      "What's the weather in Tokyo?",
-      'Change the background to violet',
-      'Show me incident INC-4711, severity sev1.',
+      'Check the weather in Tokyo for me.',
+      'Could you change the background to violet?',
+      'Pull up incident INC-4711 for me. It is a sev1.',
     ],
     waitAfterPromptMs: 4000,
   },
@@ -164,7 +164,7 @@ export const PAGES = definePages([
     // The prompt is kept so the entry stays valid and so re-enabling the chat
     // turn is a one-line change once a catalog exists; the handler does not
     // send it.
-    prompt: 'Show me a card comparing two flight options.',
+    prompt: 'Could you show me a card that compares two flight options?',
     waitAfterPromptMs: 4000,
   },
   {
@@ -182,7 +182,7 @@ export const PAGES = definePages([
     // answerable from the system prompt. The microphone then records, and this
     // runtime configures no transcription service, so transcription fails by
     // design — the handler shows that and says so.
-    prompt: 'Read the attached chart. What is its title, and what is the Q4 value?',
+    prompt: 'Have a look at the chart I attached. What is it titled, and what does Q4 come to?',
     waitAfterPromptMs: 4000,
   },
   {
@@ -202,7 +202,7 @@ export const PAGES = definePages([
         endLine: 39,
       },
     ],
-    prompt: 'Delete my account, but ask me to approve it first.',
+    prompt: 'Please delete my account. Check with me before you actually do it.',
     waitAfterPromptMs: 4000,
   },
   {
@@ -239,12 +239,12 @@ export const PAGES = definePages([
     // `prompt` mirrors prompts[0], the convention the doctor enforces: the
     // single-prompt field is always the first turn, never a different one.
     prompt:
-      'Before I change anything: what priority is my workspace currently set to?',
+      'Before I touch anything, what priority is my workspace on right now?',
     prompts: [
-      'Before I change anything: what priority is my workspace currently set to?',
-      'I just changed it. What priority is my workspace set to now?',
-      'I changed it again. What is the priority now?',
-      'What is my username and timezone, and what priority is my workspace set to?',
+      'Before I touch anything, what priority is my workspace on right now?',
+      'I just changed it. What is it set to now?',
+      'Changed it once more. And now?',
+      'Remind me: what is my username, my timezone, and my workspace priority?',
     ],
     waitAfterPromptMs: 4000,
   },
@@ -267,7 +267,7 @@ export const PAGES = definePages([
     // Thread endpoints are licensed. Unlicensed, the hand-built list stays empty
     // and the drawer renders its locked state — which is the expected result,
     // and what this recording documents. The chat beside it answers normally.
-    prompt: 'Give me a one-line summary of what threads are for.',
+    prompt: 'In one line, what are threads for?',
     waitAfterPromptMs: 4000,
   },
   {
@@ -281,7 +281,7 @@ export const PAGES = definePages([
     endLine: 30,
     // isAvailable() is false against this runtime, so the guide's fallback is
     // what renders. The handler rests on it before prompting the chat beside it.
-    prompt: 'Remember that I am working on an Angular 22 project.',
+    prompt: 'Just so you know for later: I am working on an Angular 22 project.',
     waitAfterPromptMs: 4000,
   },
   {
@@ -298,7 +298,7 @@ export const PAGES = definePages([
     // "what types of attachments are supported?" could be answered from the
     // system prompt alone, which is why a broken upload looked fine on video.
     prompt:
-      'Read the attached chart. What is its title, and what is the Q4 value?',
+      'I attached a chart. What is its title, and what is the Q4 number?',
     waitAfterPromptMs: 4000,
   },
   {
@@ -310,7 +310,7 @@ export const PAGES = definePages([
     ideFile: 'frontend/src/app/features/headless/headless-chat.component.ts',
     startLine: 10,
     endLine: 60,
-    prompt: 'Tell me a short joke about Angular.',
+    prompt: 'Tell me a short joke about Angular developers.',
     waitAfterPromptMs: 4000,
   },
   {
@@ -331,7 +331,7 @@ export const PAGES = definePages([
       { filePath: 'frontend/src/app/app.config.ts', startLine: 51, endLine: 60 },
       { filePath: 'frontend/src/styles.css', startLine: 338, endLine: 348 },
     ],
-    prompt: 'Say hello so the AG-UI event stream has something to show.',
+    prompt: 'Say hi! I want to watch the events go by in the inspector.',
     waitAfterPromptMs: 4000,
   },
 ]);
