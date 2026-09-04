@@ -419,11 +419,17 @@ jobs:
         with:
           enable-cache: true
 
-      # Must match backend/.python-version. Installing 3.12 while the project
-      # pins 3.13 only worked when the runner image happened to ship 3.13;
-      # when it did not, uv sync died with "No interpreter found for Python 3.13".
+      # backend/pyproject.toml sets python-preference = "only-system" and
+      # python-downloads = "never" -- a Windows workaround for Smart App Control
+      # blocking the unsigned _ctypes.pyd in uv's own CPython builds. uv honours
+      # it on the runner too, so `uv python install 3.13` fetched an interpreter
+      # uv then refused to look at, and `uv sync` died with "No interpreter found
+      # for Python 3.13" once the image stopped shipping one of its own. Install a
+      # real system 3.13 instead -- that is what only-system will accept.
       - name: Set up Python 3.13
-        run: uv python install 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
 
       - name: Set up Node.js 22
         uses: actions/setup-node@v4
