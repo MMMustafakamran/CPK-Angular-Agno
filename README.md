@@ -5,7 +5,7 @@ A navigable, working test harness for the Angular section of the CopilotKit Agno
 | | |
 |---|---|
 | **Doc sync date** | 2026-08-12 (docs last fetched live) |
-| **CopilotKit packages** | `@copilotkit/angular` 0.4.0 · `@copilotkit/runtime` 1.69.2 |
+| **CopilotKit packages** | `@copilotkit/angular` 0.5.1 · `@copilotkit/runtime` 1.70.1 |
 | **AG-UI packages** | `@ag-ui/agno` 0.0.5 |
 | **Frontend** | Angular 22.1.1 · TypeScript 6.0 · Tailwind 4 · zoneless |
 | **Runtime** | Node 24.16.0 · Copilot Runtime v2 Node listener on :8200 |
@@ -256,7 +256,7 @@ The minimum viable path: an `AgnoAgent` in the runtime, `provideCopilotKit`, one
 Three surfaces in tabs — only one mounts at a time, since the popup and docked sidebar both use fixed positioning. **Try:** `What is CopilotKit?`, then switch tabs. **Pass:** the inline chat shows the guide's blue user bubbles and pale-blue assistant bubbles; the custom-message tab renders replies through a hand-written component labelled "Assistant"; the popup and sidebar open, trap focus, and close on Escape. **Fail:** a surface renders blank, or all tabs look identical.
 
 **`/frontend-tools-generative-ui` — Frontend tools and generative UI**
-A server-side tool call rendered by an Angular component. **Try:** `What's the weather in Tokyo?` **Pass:** the call renders through `WeatherCardComponent` — "Loading weather for Tokyo", then the city in bold with the result beneath. **Fail:** a plain-text answer with no card, meaning the renderer name and the agent's tool name have drifted apart.
+A server-side tool call rendered by an Angular component. **Try:** `What's the weather in Tokyo?` **Pass:** the call renders through `WeatherCardComponent` — "Loading weather for Tokyo", then the city in bold with the result beneath. **Fail:** a plain-text answer with no card, meaning the renderer name and the agent's tool name have drifted apart. **Also:** the guide now leads with a third path, `registerComponent` (display-only, no handler, nothing on the agent side). **Try:** `Show me incident INC-4711, severity sev1.` **Pass:** the card renders — and the agent then apologises for it in the next message, which is the finding. The route is ⚠️ Partial. See Known issues #19.
 
 **`/a2ui` — A2UI schemas, styling, and recovery**
 Declarative generative UI. **Try:** `Show me a card comparing two flight options.` **Pass:** a rendered declarative surface appears in the chat. **Currently observed:** prose instead — see Known issues #2. **Fail (different failure):** raw JSON or protocol operations printed as text.
@@ -299,7 +299,7 @@ Verified 2026-08-12 against a live stack (real OpenAI key, no license key).
 | `/angular/agno` | `/` | 📖 Reference | Landing page + live probe of both backends. |
 | `/angular/agno/quickstart` | `/quickstart` | ✅ Working | Verified end-to-end: streamed reply from gpt-4o. |
 | `/angular/agno/guides/chat-ui` | `/chat-ui` | ✅ Working | All four surfaces; three mounted, `CopilotChatView` referenced only. |
-| `/angular/agno/guides/frontend-tools-generative-ui` | `/frontend-tools-generative-ui` | ✅ Working | `registerRenderToolCall` verified over the wire: `getWeather` called with `{"city":"Tokyo"}`. `registerFrontendTool` samples shown, not mounted — see Known issues #4. |
+| `/angular/agno/guides/frontend-tools-generative-ui` | `/frontend-tools-generative-ui` | ⚠️ Partial | `registerRenderToolCall` verified over the wire: `getWeather` called with `{"city":"Tokyo"}`. The guide’s new first section, `registerComponent`, is mounted and runs on `^0.5.1`, and its published snippet is wrong four ways — Known issues #19. `registerFrontendTool` samples shown, not mounted — see Known issues #4. |
 | `/angular/agno/guides/a2ui` | `/a2ui` | ⚠️ Partial | Inert without a frontend catalog — that, not the runtime middleware, is the switch. See Known issues #2. |
 | `/angular/agno/guides/voice-multimodal` | `/voice-multimodal` | ⚠️ Partial | Attachments work. Transcription unavailable by design — `audioFileTranscriptionEnabled: false`. |
 | `/angular/agno/guides/human-in-the-loop` | `/human-in-the-loop` | ✅ Working | Verified: `requestApproval` emitted with **no** tool result, run pauses awaiting the browser. Interrupt half idle — agent emits none. |
@@ -578,6 +578,87 @@ Three things the page never says, all of which a reader hits immediately:
 
 Not a defect in the sample's behaviour — a defect in its testability, which
 rule 3 of `project-context.md` counts the same way.
+
+**19. The new `registerComponent` section runs, and its snippet is wrong four ways**
+
+[Frontend tools and generative UI](https://docs.copilotkit.ai/angular/agno/guides/frontend-tools-generative-ui)
+gained a new **first** section, "Let the agent display one of your components",
+teaching `registerComponent`: display-only generative UI, no `handler`, nothing
+on the agent side. It also added a row to the "Choose a generative UI path"
+table and a Next-steps link to `/reference/angular/functions/registerComponent`.
+
+The premise holds. `show_incident` is declared by the browser, forwarded over
+AG-UI, and called by the model with the Agno process untouched. Implemented
+verbatim at `@copilotkit/angular` 0.5.1, the published snippet then fails four
+ways, all reproduced against a live agent:
+
+1. **The agent apologises for the card it just drew.** With no `handler`, core
+   returns an empty tool result, the model reads the emptiness as failure, and
+   posts a second message contradicting the correct card above it. Every run.
+   `followUp: false` suppresses it — `RegisterComponentConfig` carries the field
+   and the guide never mentions it.
+2. **The loading guard never fires.** It gates on `status === "in-progress"`;
+   the observed status while arguments stream is `"executing"`, so the `@else`
+   branch runs with empty args and paints a blank card before the values land.
+3. **The status never reaches `"complete"`.** Sampled once a second for 25
+   seconds: `"executing"` throughout. The `registerRenderToolCall` snippet
+   higher up this same page gates its content on `"complete"`, so that
+   documented pattern applied to a display-only tool loads forever.
+4. **The card is not a card.** The snippet ships no CSS and pairs an inline
+   `<strong>` with an inline `<span>`; Angular's default
+   `preserveWhitespaces: false` strips the gap, so it renders as the unstyled
+   run-together string `INC-4711sev1`.
+
+Smaller gaps: the registration is a bare ` ```ts ` fence with no imports, so
+`registerComponent` and `z` are undefined identifiers as published; the section
+never says it must run in an Angular injection context, though the API
+reference requires one and the `registerFrontendTool` section below does say
+so; and the `description` you pass is not what the model receives — core
+prepends a fixed preamble.
+
+Everything is kept verbatim at
+`frontend/src/app/features/tools/incident-card.component.ts` and in
+`tools-chat.component.ts`. The defects are the snippet's own.
+
+*Note, not a finding:* `registerComponent` does not exist in
+`@copilotkit/angular` 0.4.0, which this repo declared until now, and `^0.4.0`
+can never reach 0.5.x. The quickstart's unpinned `npm install` gives a new
+reader 0.5.1, so the frontend moved to `^0.5.1` (and `@copilotkit/runtime` to
+`^1.70.1`, which 0.5.1 pins) to QA the section at all.
+
+**20. The same page now teaches two incompatible renderer styles**
+
+Still on [Frontend tools and generative UI](https://docs.copilotkit.ai/angular/agno/guides/frontend-tools-generative-ui):
+the older "Render a tool result" snippet imports
+`{ type AngularToolCall, type ToolRenderer }` and sets no `standalone`. The new
+`registerComponent` snippet imports the same two symbols as **values** and sets
+`standalone: true`. Two renderers, one page, one package, two import styles and
+two decorator shapes, with nothing on the page acknowledging the difference.
+
+`frontend/AGENTS.md` in this repo also states that components must **not** set
+`standalone: true` — it is the default in Angular v20+ — so the guide's new
+snippet violates the house rule its older sibling on the same page happens to
+respect. Both are kept verbatim here (rule 1); normalising either would hide
+the conflict.
+
+**21. Six documentation pages moved with no redirect and no note**
+
+The docs section `premium/*` was renamed to `intelligence/*` upstream. All six
+pages this repo tracks under it — `overview`, `intelligence-platform`,
+`managed-intelligence-platform`, `connect-your-runtime`, `self-hosting`,
+`threads-explained` — began returning **404** at their old paths, while the
+identical content serves 200 at the new ones. No redirect was left behind and
+no changelog entry announces the move.
+
+Cost here: `node ci/check-doc-drift.mjs` exited **2** on six HIGH "Page 404 /
+Removed" results, which reds the nightly pipeline's drift gate and sets
+`should_record=false` — so nothing in this repo recorded at all until the paths
+were retargeted. `threads-explained` hashed identical at the new path, which is
+the proof it was a move and not a rewrite; the other five carried ordinary
+prose drift on top.
+
+Retargeted in `frontend/scripts/sync-docs.ts`, `doc-snapshot/manifest.json`, and
+the six `doc-snapshot/pages/angular__agno__intelligence__*.md` filenames.
 
 ---
 

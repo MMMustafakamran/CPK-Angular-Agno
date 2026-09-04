@@ -107,7 +107,9 @@ export const NAV: NavGroup[] = [
         docPath: '/angular/agno/guides/frontend-tools-generative-ui',
         summary:
           'A server-side tool call rendered by an Angular component, plus the sandboxed Open Generative UI path.',
-        status: 'working',
+        status: 'partial',
+        statusNote:
+          'All three of the guide’s generative-UI paths are live, including registerComponent, which declares show_incident from the browser with no change to the Agno process. The new first section runs, and its published snippet is wrong in four ways. It carries no handler, so core returns an empty tool result and the model apologises for the card it just drew — followUp: false suppresses that and the guide never mentions followUp. It guards on status "in-progress" while the real status is "executing", so the guard never fires and the card paints empty first. The status never reaches "complete" at all, so the gate-on-complete pattern taught higher up the same page would load forever here. And it ships no CSS, so with Angular’s default preserveWhitespaces the card renders as the run-together string INC-4711sev1. Everything is kept verbatim.',
       },
       {
         path: '/a2ui',
