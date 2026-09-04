@@ -419,8 +419,11 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Set up Python 3.12
-        run: uv python install 3.12
+      # Must match backend/.python-version. Installing 3.12 while the project
+      # pins 3.13 only worked when the runner image happened to ship 3.13;
+      # when it did not, uv sync died with "No interpreter found for Python 3.13".
+      - name: Set up Python 3.13
+        run: uv python install 3.13
 
       - name: Set up Node.js 22
         uses: actions/setup-node@v4
